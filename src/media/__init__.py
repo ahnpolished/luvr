@@ -1,0 +1,1 @@
+"""Media processing package - vision analysis and audio transcription."""
