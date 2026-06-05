@@ -50,12 +50,11 @@ def test_create_anthropic_client(monkeypatch):
 
 def test_create_client_missing_api_key():
     """Test that missing API key raises error."""
-    with patch("src.llm.client.settings"):
-        from src.config import settings as s
-
-        with patch.object(s, "openai_api_key", None), patch.object(s, "llm_provider", "openai"):
-            with pytest.raises(ValueError, match="OPENAI_API_KEY"):
-                create_llm_client(provider="openai")
+    with patch("src.llm.client.settings") as mock_settings:
+        mock_settings.openai_api_key = None
+        mock_settings.llm_provider = "openai"
+        with pytest.raises(ValueError, match="OPENAI_API_KEY"):
+            create_llm_client(provider="openai")
 
 
 def test_create_client_unsupported_provider():
