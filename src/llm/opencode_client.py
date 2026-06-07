@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import structlog
-from opencode_ai import AsyncOpencode
 
 from src.llm.client import LLMAPIError, LLMClient
 from src.llm.prompts import DATING_ADVISOR_SYSTEM_PROMPT
@@ -21,6 +20,8 @@ class OpenCodeClient(LLMClient):
         base_url: str = "http://localhost:54321",
         api_key: str | None = None,
     ) -> None:
+        from opencode_ai import AsyncOpencode  # lazy import (optional dependency)
+
         self.model_id = model_id
         self.provider_id = provider_id
         headers = {"Authorization": f"Bearer {api_key}"} if api_key else None

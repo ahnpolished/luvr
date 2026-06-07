@@ -121,7 +121,13 @@ def create_llm_client(provider: LLMProvider | None = None) -> LLMClient:
         return AnthropicClient(api_key=settings.anthropic_api_key, model=settings.llm_model)
 
     elif provider == "opencode":
-        from src.llm.opencode_client import OpenCodeClient
+        try:
+            from src.llm.opencode_client import OpenCodeClient
+        except ImportError as e:
+            raise ValueError(
+                "opencode-ai package is required for the OpenCode provider. "
+                "Install it with: pip install luvr[opencode]"
+            ) from e
 
         logger.info(
             "llm_client_created",
