@@ -59,7 +59,9 @@ BlueBubbles is the bridge between iMessage and the Luvr bot.
    - Set a **password** (use the same one as in your `.env`)
    - Note the **server URL** (default: `http://localhost:1234`)
 3. Go to **Webhook** tab:
-   - Set webhook URL to: `http://localhost:8000/webhook`
+   - Set webhook URL to: `http://127.0.0.1:8000/webhook`
+     (Use `127.0.0.1` NOT `localhost` — BlueBubbles resolves `localhost` to IPv6 `::1`,
+     which won't connect to the server.)
    - Enable "New Message" event
 4. Go to **Connection** tab:
    - Ensure iMessage is connected (green indicator)
@@ -144,7 +146,7 @@ Record a voice memo in iMessage and send it. The bot will transcribe and respond
 ### Messages not coming through
 
 1. Check BlueBubbles is running and connected to iMessage
-2. Verify webhook is configured to `http://localhost:8000/webhook`
+2. Verify webhook is configured to `http://127.0.0.1:8000/webhook` (NOT localhost!)
 3. Check Luvr logs for errors
 
 ### LLM errors

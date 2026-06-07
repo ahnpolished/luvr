@@ -1,4 +1,4 @@
-.PHONY: install run test lint format clean smoke-test setup
+.PHONY: install run test lint format clean smoke-test setup run-telegram test-cov tg-smoke-test
 
 # Default Python
 PYTHON := python3
@@ -44,3 +44,15 @@ smoke-test:
 setup:
 	@echo "🛠️  Running setup script..."
 	bash scripts/setup.sh
+
+run-telegram:
+	@echo "🤖 Starting Luvr Telegram bot..."
+	. $(VENV)/bin/activate && python -m src.telegram_server
+
+test-cov:
+	@echo "🧪 Running tests with coverage..."
+	. $(VENV)/bin/activate && pytest --cov=src --cov-report=term-missing --cov-report=html
+
+tg-smoke-test:
+	@echo "💨 Running Telegram smoke tests..."
+	. $(VENV)/bin/activate && python scripts/telegram_smoke_test.py

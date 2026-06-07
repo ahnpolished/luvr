@@ -17,7 +17,7 @@ def test_settings_defaults(monkeypatch):
         bluebubbles_password="test",
     )
 
-    assert settings.host == "0.0.0.0"
+    assert settings.host == "::"
     assert settings.port == 8000
     assert settings.llm_provider == "openai"
     assert settings.llm_model == "gpt-4o-mini"

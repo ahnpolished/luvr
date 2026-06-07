@@ -16,9 +16,9 @@ logger = structlog.get_logger(__name__)
 class OpenAIClient(LLMClient):
     """LLM client using OpenAI's API (gpt-4o-mini with vision)."""
 
-    def __init__(self, api_key: str, model: str = "gpt-4o-mini") -> None:
+    def __init__(self, api_key: str, model: str = "gpt-4o-mini", base_url: str | None = None) -> None:
         self.model = model
-        self._client = AsyncOpenAI(api_key=api_key)
+        self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
     async def generate_response(
         self,
