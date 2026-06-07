@@ -11,7 +11,7 @@ from src.config import settings
 
 logger = structlog.get_logger(__name__)
 
-LLMProvider = Literal["openai", "anthropic"]
+LLMProvider = Literal["openai", "anthropic", "deepseek", "opencode"]
 
 
 class LLMClient(ABC):
@@ -99,6 +99,21 @@ def create_llm_client(provider: LLMProvider | None = None) -> LLMClient:
         logger.info("llm_client_created", provider="openai", model=settings.llm_model)
         return OpenAIClient(api_key=settings.openai_api_key, model=settings.llm_model)
 
+    elif provider == "deepseek":
+        if not settings.deepseek_api_key:
+            raise ValueError(
+                "DEEPSEEK_API_KEY is required when using DeepSeek. "
+                "Set it in your .env file or environment."
+            )
+        from src.llm.openai_client import OpenAIClient
+
+        logger.info("llm_client_created", provider="deepseek", model=settings.llm_model)
+        return OpenAIClient(
+            api_key=settings.deepseek_api_key,
+            model=settings.llm_model,
+            base_url="https://api.deepseek.com",
+        )
+
     elif provider == "anthropic":
         if not settings.anthropic_api_key:
             raise ValueError(
@@ -109,6 +124,22 @@ def create_llm_client(provider: LLMProvider | None = None) -> LLMClient:
 
         logger.info("llm_client_created", provider="anthropic", model=settings.llm_model)
         return AnthropicClient(api_key=settings.anthropic_api_key, model=settings.llm_model)
+
+    elif provider == "opencode":
+        from src.llm.opencode_client import OpenCodeClient
+
+        logger.info(
+            "llm_client_created",
+            provider="opencode",
+            model=settings.llm_model,
+            opencode_provider=settings.opencode_provider_id,
+        )
+        return OpenCodeClient(
+            model_id=settings.llm_model,
+            provider_id=settings.opencode_provider_id,
+            base_url=settings.opencode_base_url,
+            api_key=settings.opencode_api_key,
+        )
 
     else:
         raise ValueError(f"Unsupported LLM provider: {provider}")

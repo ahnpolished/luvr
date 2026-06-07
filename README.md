@@ -1,23 +1,64 @@
-# 💝 Luvr — iMessage Dating Advice Chatbot
+# 💝 Luvr — Dating Advice Chatbot
 
 > **Like Poke, but for dating advice.**  
-> An AI-powered chatbot that lives in iMessage and gives you real, empathetic dating advice — via text, photos, and voice memos.
+> An AI-powered chatbot that lives in iMessage or Telegram and gives you real, empathetic dating advice — via text, photos, and voice memos.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Status: MVP](https://img.shields.io/badge/status-v0.1.0--alpha-orange.svg)](https://github.com/ahnpolished/luvr)
+[![Status: v0.1.0-alpha](https://img.shields.io/badge/status-v0.1.0--alpha-orange.svg)](https://github.com/ahnpolished/luvr)
+[![CI](https://github.com/ahnpolished/luvr/actions/workflows/ci.yml/badge.svg)](https://github.com/ahnpolished/luvr/actions/workflows/ci.yml)
 
 ## 🎯 What is Luvr?
 
-Luvr is an iMessage-based chatbot that gives **dating and relationship advice**. You talk to it just like you'd text a friend:
+Luvr is a chatbot that gives **dating and relationship advice**. You talk to it just like you'd text a friend:
 
 - **Text**: "Should I text him back tonight?"
 - **Photo**: Screenshot a confusing conversation → get analysis
 - **Voice memo**: Vent about your date → get thoughtful advice
 
-It uses an iMessage bridge (BlueBubbles) to connect to your Mac's Messages app, and GPT-4o-mini or Claude to generate responses.
+Luvr works on two platforms:
+
+| Platform | Bridge | Setup Complexity | Requires Mac? |
+|----------|--------|-----------------|---------------|
+| **iMessage** 💬 | BlueBubbles | Medium | ✅ Yes |
+| **Telegram** 🤖 | Telegram Bot API | Easy | ❌ No |
+
+### Telegram Version (NEW! 🎉)
+
+The Telegram version is the easiest way to get started. Just create a bot with @BotFather, set your API keys, and you're ready to go — no Mac required!
+
+### iMessage Version
+
+The iMessage version uses BlueBubbles to bridge iMessage to a REST API, allowing Luvr to read and respond to your iMessages on any device.
+
+LLM-powered by GPT-4o-mini or Claude.
 
 ## 🏗️ Architecture
+
+### Telegram Version
+
+```
+┌──────────┐     ┌──────────────────┐     ┌─────────────────┐     ┌──────────┐
+│ Telegram │────▶│  python-telegram │────▶│  Luvr Bot       │────▶│   LLM    │
+│   App    │     │  -bot (polling)  │     │  (Handlers)     │     │ (GPT-4o) │
+└──────────┘     └──────────────────┘     └─────────────────┘     └──────────┘
+                        │                           │
+                        │  Update                   │  API Calls
+                        │  (new msg)                │
+                        ▼                           ▼
+                 ┌──────────────────────────────────────┐
+                 │        Message Pipeline              │
+                 │  ┌──────┐ ┌───────┐ ┌────────┐      │
+                 │  │ Text │ │ Photo │ │ Voice  │      │
+                 │  │Handler│ │Handler│ │Handler │      │
+                 │  └──┬───┘ └──┬────┘ └───┬────┘      │
+                 │     │        │          │            │
+                 │     ▼        ▼          ▼            │
+                 │   LLM     Vision     Whisper→LLM     │
+                 └──────────────────────────────────────┘
+```
+
+### iMessage Version
 
 ```
 ┌──────────┐     ┌──────────────────┐     ┌─────────────────┐     ┌──────────┐
@@ -70,7 +111,7 @@ cp .env.example .env
 2. Configure it with your iMessage account
 3. Set a server password in BlueBubbles settings
 4. Note your server URL (usually `http://localhost:1234`)
-5. Configure webhook: set it to POST to `http://localhost:8000/webhook`
+5. Configure webhook: set it to POST to `http://127.0.0.1:8000/webhook` (use 127.0.0.1, not localhost — BlueBubbles prefers IPv6 and won't reach the server)
 
 ### 4. Run
 
@@ -87,21 +128,71 @@ Or run smoke tests (no iMessage needed):
 make smoke-test
 ```
 
+## 🤖 Telegram Quick Start
+
+### Prerequisites
+
+- **Python 3.12+**
+- **Telegram Bot Token** from [@BotFather](https://t.me/BotFather)
+- **OpenAI API key** (for GPT-4o-mini + Whisper) **or** **Anthropic API key** (for Claude)
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/ahnpolished/luvr.git
+cd luvr
+make install
+```
+
+### 2. Create a Telegram Bot
+
+1. Open Telegram and chat with [@BotFather](https://t.me/BotFather)
+2. Send `/newbot` and follow the prompts
+3. Copy the bot token you receive (looks like `123456:ABCdef...`)
+
+### 3. Configure
+
+```bash
+cp .env.example .env
+# Edit .env:
+#   TELEGRAM_BOT_TOKEN=your_token_from_botfather
+#   OPENAI_API_KEY=sk-your-key
+#   LLM_PROVIDER=openai
+#   PLATFORM=telegram
+```
+
+### 4. Run
+
+```bash
+make run-telegram
+```
+
+### 5. Chat!
+
+Open Telegram, find your bot, and send `/start`!
+
+---
+
+## 💬 iMessage Quick Start
+
+(Requires a Mac with iMessage signed in and BlueBubbles installed.)
+
 ## 📋 Features (v0.1.0)
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| 💬 Text messages | ✅ | Plain text dating advice via LLM |
-| 📸 Photo analysis | ✅ | Screenshot/photo analysis via vision model |
-| 🎤 Voice memos | ✅ | Audio transcription via Whisper → advice |
-| 🔄 Multi-turn chat | ✅ | Natural back-and-forth conversation |
-| 🔒 Safety filters | ✅ | Crisis recognition + resource provision |
-| 🧪 Smoke tests | ✅ | Test without real iMessage |
+| Feature | iMessage | Telegram | Description |
+|---------|----------|----------|-------------|
+| 💬 Text messages | ✅ | ✅ | Plain text dating advice via LLM |
+| 📸 Photo analysis | ✅ | ✅ | Screenshot/photo analysis via vision model |
+| 🎤 Voice memos | ✅ | ✅ | Audio transcription via Whisper → advice |
+| 🔄 Multi-turn chat | ✅ | ✅ | Natural back-and-forth conversation |
+| 🔒 Safety filters | ✅ | ✅ | Crisis recognition + resource provision |
+| 🧪 Smoke tests | ✅ | ✅ | Test without real messaging |
+| 🤖 Telegram Bot API | — | ✅ | Easy setup, no Mac required |
 
 ## 🛠️ Tech Stack
 
-- **Bridge**: [BlueBubbles](https://bluebubbles.app) — iMessage ↔ REST API
-- **Server**: FastAPI + uvicorn (async Python)
+- **Bridges**: [BlueBubbles](https://bluebubbles.app) (iMessage) | [python-telegram-bot](https://python-telegram-bot.org) (Telegram)
+- **Server**: FastAPI + uvicorn (iMessage) | python-telegram-bot polling (Telegram)
 - **LLM**: OpenAI GPT-4o-mini (primary) or Anthropic Claude 3 Haiku
 - **Vision**: Native vision capabilities in both models
 - **Transcription**: OpenAI Whisper

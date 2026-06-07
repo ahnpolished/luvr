@@ -27,11 +27,13 @@ dependencies = [
     "httpx>=0.28.0",
     "openai>=1.60.0",
     "anthropic>=0.42.0",
+    "opencode-ai>=0.1.0",
     "python-dotenv>=1.0.0",
     "pydantic>=2.10.0",
     "pydantic-settings>=2.7.0",
     "python-multipart>=0.0.18",
     "structlog>=24.4.0",
+    "python-telegram-bot[job-queue]>=21.0",
 ]
 
 [project.optional-dependencies]
@@ -45,9 +47,13 @@ dev = [
     "mypy>=1.13.0",
 ]
 
+[project.scripts]
+luvr-telegram = "src.telegram_server:main"
+luvr-server = "src.server:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*"]
+include = ["src*", "examples*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

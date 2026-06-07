@@ -6,6 +6,7 @@ import structlog
 
 from src.bridge.client import BlueBubblesClient
 from src.bridge.models import WebhookPayload
+from src.config import settings
 from src.handler.photo_handler import PhotoHandler
 from src.handler.router import MessageRouter
 from src.handler.text_handler import TextHandler
@@ -69,13 +70,44 @@ class MessagePipeline:
         """Process an incoming webhook payload from BlueBubbles.
 
         Args:
-            raw_payload: Raw JSON payload from BlueBubbles webhook
+            raw_payload: Raw JSON payload from BlueBubbles webhook.
+                         BlueBubbles wraps the message in a {type, data} envelope.
         """
-        try:
-            payload = WebhookPayload.model_validate(raw_payload)
+        payload = None  # initialised here so the error handler can reference it
 
-            # Skip messages from ourselves (don't loop)
-            if payload.is_from_me:
+        try:
+            # BlueBubbles sends webhooks with a {type, data} envelope.
+            event_type = raw_payload.get("type", "")
+
+            # Only process new-message events; skip status updates, typing, etc.
+            if event_type not in ("new-message", ""):
+                logger.debug("skipping_event", type=event_type)
+                return
+
+            # Extract the inner data payload before model validation.
+            if "data" in raw_payload:
+                inner = raw_payload["data"]
+                raw_payload = inner
+
+            # Model validation — catch Pydantic errors separately so we can log
+            # the offending fields, then bail out gracefully.
+            try:
+                payload = WebhookPayload.model_validate(raw_payload)
+            except Exception as exc:
+                if isinstance(raw_payload, dict):
+                    non_str_fields = {k: type(v).__name__ for k, v in raw_payload.items() if not isinstance(v, str)}
+                else:
+                    non_str_fields = {}
+                logger.warning(
+                    "pipeline_validation_skipped",
+                    error=str(exc),
+                    non_str_fields=non_str_fields,
+                )
+                return
+
+            # Skip messages from ourselves to prevent infinite loops.
+            # Disable skip_own_messages when testing with self-sent messages.
+            if settings.skip_own_messages and payload.is_from_me:
                 logger.debug("skipping_own_message")
                 return
 
@@ -107,7 +139,7 @@ class MessagePipeline:
             logger.exception("pipeline_error")
             # Try to send error message back to user
             try:
-                if "payload" in locals() and payload.chat_guid:
+                if payload is not None and payload.chat_guid:
                     await self.bridge_client.send_message(
                         chat_guid=payload.chat_guid,
                         message="😅 Oops, something went wrong on my end. Could you try again?",

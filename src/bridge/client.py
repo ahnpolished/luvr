@@ -8,6 +8,7 @@ API Reference: https://bluebubbles.app/docs/api/
 
 from __future__ import annotations
 
+import uuid
 from pathlib import Path
 
 import httpx
@@ -69,6 +70,7 @@ class BlueBubblesClient:
             "message": message,
             "method": "apple-script",
             "subject": subject,
+            "tempGuid": str(uuid.uuid4()),
         }
 
         logger.debug("sending_message", chat_guid=chat_guid, message_len=len(message))

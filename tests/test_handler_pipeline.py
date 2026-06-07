@@ -57,9 +57,12 @@ def test_webhook_payload_audio_detection(sample_voice_payload):
 
 @pytest.mark.asyncio
 async def test_pipeline_skips_own_messages(
-    mock_bridge_client, mock_llm_client, sample_own_message_payload
+    mock_bridge_client, mock_llm_client, sample_own_message_payload, monkeypatch
 ):
     """Test pipeline skips messages sent by the bot."""
+    # Ensure skip_own_messages is enabled (the .env file may disable it)
+    monkeypatch.setattr("src.handler.pipeline.settings.skip_own_messages", True)
+
     pipeline = MessagePipeline(bridge_client=mock_bridge_client)
     pipeline._llm_client = mock_llm_client
 

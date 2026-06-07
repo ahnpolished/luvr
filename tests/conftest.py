@@ -6,6 +6,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+pytest_plugins = []  # allow conftest-level plugin registration
+
 
 @pytest.fixture
 def mock_settings(monkeypatch):

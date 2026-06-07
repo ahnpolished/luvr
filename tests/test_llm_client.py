@@ -24,8 +24,9 @@ def test_create_openai_client(monkeypatch):
     with patch("src.llm.client.settings"):
         from src.config import settings as s
 
-        with patch.object(s, "openai_api_key", "sk-test-key"), patch.object(
-            s, "llm_provider", "openai"
+        with (
+            patch.object(s, "openai_api_key", "sk-test-key"),
+            patch.object(s, "llm_provider", "openai"),
         ):
             client = create_llm_client(provider="openai")
             assert client is not None
@@ -40,8 +41,9 @@ def test_create_anthropic_client(monkeypatch):
     with patch("src.llm.client.settings"):
         from src.config import settings as s
 
-        with patch.object(s, "anthropic_api_key", "sk-ant-test-key"), patch.object(
-            s, "llm_provider", "anthropic"
+        with (
+            patch.object(s, "anthropic_api_key", "sk-ant-test-key"),
+            patch.object(s, "llm_provider", "anthropic"),
         ):
             client = create_llm_client(provider="anthropic")
             assert client is not None
