@@ -15,6 +15,8 @@ def test_settings_defaults(monkeypatch):
         _env_file=None,  # Don't read .env file in tests
         bluebubbles_server_url="http://test:1234",
         bluebubbles_password="test",
+        host="::",
+        llm_provider="openai",
     )
 
     assert settings.host == "::"
