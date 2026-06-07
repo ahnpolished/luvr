@@ -20,6 +20,7 @@ from telegram import Chat, Message, PhotoSize, Voice
 # Helper: create a mock Telegram Message with reasonable defaults
 # ---------------------------------------------------------------------------
 
+
 def _mock_message(
     chat_id: int = 123456,
     text: str | None = "Hello!",
@@ -71,6 +72,7 @@ def _setup_bc_llm():
 # /start command
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_handle_start():
     """Test /start sends welcome message."""
@@ -95,6 +97,7 @@ async def test_handle_start_no_message():
 # Text handler
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_handle_text_dispatches_to_text_handler():
     """Test text message is handled by the TextHandler pipeline."""
@@ -112,9 +115,7 @@ async def test_handle_text_dispatches_to_text_handler():
         await handle_text(update, _mock_context(), bridge_client=mock_bc, llm_client=mock_llm)
 
         mock_bc.configure.assert_called_once()
-        mock_bc.send_message.assert_called_once_with(
-            chat_guid="123456", message="Here's my advice."
-        )
+        mock_bc.send_message.assert_called_once_with(chat_guid="123456", message="Here's my advice.")
 
 
 @pytest.mark.asyncio
@@ -169,6 +170,7 @@ async def test_handle_text_handler_error():
 # ---------------------------------------------------------------------------
 # Photo handler
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_handle_photo_dispatches_to_photo_handler():
@@ -304,6 +306,7 @@ async def test_handle_photo_missing_deps():
 # ---------------------------------------------------------------------------
 # Voice handler
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_handle_voice_dispatches_to_voice_handler():

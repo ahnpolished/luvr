@@ -45,9 +45,7 @@ class OpenCodeClient(LLMClient):
             messages = await self._client.session.messages(session.id)
             for item in reversed(messages):
                 if item.info.role == "assistant":
-                    text = " ".join(
-                        part.text for part in item.parts if hasattr(part, "text")
-                    )
+                    text = " ".join(part.text for part in item.parts if hasattr(part, "text"))
                     if text:
                         return text.strip()
             return ""

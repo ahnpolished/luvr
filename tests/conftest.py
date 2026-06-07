@@ -99,10 +99,6 @@ def mock_bridge_client():
 def mock_llm_client():
     """Mock LLM client for handler tests."""
     client = AsyncMock()
-    client.generate_response = AsyncMock(
-        return_value="Here's my thoughtful dating advice based on your situation."
-    )
-    client.analyze_image = AsyncMock(
-        return_value="Based on the image, here's some advice about this dating profile."
-    )
+    client.generate_response = AsyncMock(return_value="Here's my thoughtful dating advice based on your situation.")
+    client.analyze_image = AsyncMock(return_value="Based on the image, here's some advice about this dating profile.")
     return client

@@ -85,9 +85,7 @@ async def handle_text(
             await bc.send_message(chat_guid=str(chat_id), message=response)
     except Exception:
         logger.exception("text_handler_error")
-        await update.message.reply_text(
-            "😅 Oops, something went wrong on my end. Could you try again?"
-        )
+        await update.message.reply_text("😅 Oops, something went wrong on my end. Could you try again?")
 
 
 async def handle_photo(
@@ -138,9 +136,7 @@ async def handle_photo(
         photo_bytes = bytes(data)
     except Exception:
         logger.exception("photo_download_failed")
-        await update.message.reply_text(
-            "I had trouble downloading that photo. Could you try again? 📸"
-        )
+        await update.message.reply_text("I had trouble downloading that photo. Could you try again? 📸")
         return
 
     # --- Cache in bridge client ---
@@ -172,9 +168,7 @@ async def handle_photo(
             await bc.send_message(chat_guid=str(chat_id), message=response)
     except Exception:
         logger.exception("photo_handler_error")
-        await update.message.reply_text(
-            "I had trouble analyzing that image. Could you try again or describe it? 🧐"
-        )
+        await update.message.reply_text("I had trouble analyzing that image. Could you try again or describe it? 🧐")
 
 
 async def handle_voice(
@@ -224,9 +218,7 @@ async def handle_voice(
         voice_bytes = bytes(data)
     except Exception:
         logger.exception("voice_download_failed")
-        await update.message.reply_text(
-            "I had trouble downloading that voice memo. Could you try again? 🎤"
-        )
+        await update.message.reply_text("I had trouble downloading that voice memo. Could you try again? 🎤")
         return
 
     # --- Cache in bridge client ---
@@ -257,9 +249,7 @@ async def handle_voice(
             await bc.send_message(chat_guid=str(chat_id), message=response)
     except Exception:
         logger.exception("voice_handler_error")
-        await update.message.reply_text(
-            "I had trouble processing that voice memo. Could you try again or type it? 🎤"
-        )
+        await update.message.reply_text("I had trouble processing that voice memo. Could you try again or type it? 🎤")
 
 
 # Conditional import to avoid circular issues at module level

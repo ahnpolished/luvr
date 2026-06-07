@@ -48,10 +48,7 @@ class TextHandler:
         """Core generation logic shared by iMessage and Telegram paths."""
         if not user_text:
             logger.info("empty_text_message")
-            return (
-                "Hey! What's on your mind? I'm here to help with any "
-                "dating or relationship questions you have. 💝"
-            )
+            return "Hey! What's on your mind? I'm here to help with any dating or relationship questions you have. 💝"
 
         logger.info("handling_text_message", text_len=len(user_text))
 

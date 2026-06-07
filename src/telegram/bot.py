@@ -148,15 +148,14 @@ class LuvrBot:
 # Handler registration
 # ------------------------------------------------------------------
 
+
 def _register_handlers(app: Application[object, object, object, object]) -> None:  # type: ignore[type-arg]
     """Register all Telegram message handlers on the Application."""
     # /start command
     app.add_handler(CommandHandler("start", handle_start))
 
     # Text messages (excluding commands)
-    app.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, _build_handler(handle_text))
-    )
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, _build_handler(handle_text)))
 
     # Photo messages
     app.add_handler(MessageHandler(filters.PHOTO, _build_handler(handle_photo)))

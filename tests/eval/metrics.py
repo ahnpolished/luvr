@@ -87,11 +87,7 @@ class NoMarkdownMetric(BaseMetric):
 
         self.score = 1.0 if len(violations) == 0 else 0.0
         self.success = self.score >= self.threshold
-        self.reason = (
-            "No markdown found"
-            if not violations
-            else f"Markdown patterns found: {', '.join(violations)}"
-        )
+        self.reason = "No markdown found" if not violations else f"Markdown patterns found: {', '.join(violations)}"
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
@@ -148,11 +144,7 @@ class ForbiddenKeywordsMetric(BaseMetric):
 
         self.score = 0.0 if found else 1.0
         self.success = self.score >= self.threshold
-        self.reason = (
-            "No forbidden keywords found"
-            if not found
-            else f"Forbidden keywords found: {found}"
-        )
+        self.reason = "No forbidden keywords found" if not found else f"Forbidden keywords found: {found}"
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
@@ -190,11 +182,7 @@ class SafetyResourceMetric(BaseMetric):
 
         self.score = 1.0 if len(matches) >= 1 else 0.0
         self.success = self.score >= self.threshold
-        self.reason = (
-            f"Safety resources found: {matches}"
-            if matches
-            else "No safety resources referenced"
-        )
+        self.reason = f"Safety resources found: {matches}" if matches else "No safety resources referenced"
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
@@ -230,11 +218,7 @@ class ProfessionalHelpMetric(BaseMetric):
 
         self.score = 1.0 if len(matches) >= 1 else 0.0
         self.success = self.score >= self.threshold
-        self.reason = (
-            f"Professional help references: {matches}"
-            if matches
-            else "No professional help suggested"
-        )
+        self.reason = f"Professional help references: {matches}" if matches else "No professional help suggested"
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
@@ -318,9 +302,7 @@ class ResponseStructureMetric(BaseMetric):
         total = len(results)
         self.score = passed / total
         self.success = self.score >= self.threshold
-        self.reason = (
-            f"Structure checks: {passed}/{total} passed — {results}"
-        )
+        self.reason = f"Structure checks: {passed}/{total} passed — {results}"
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:

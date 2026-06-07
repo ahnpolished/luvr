@@ -37,13 +37,15 @@ class OpenAIClient(LLMClient):
             base64_image = base64.b64encode(image_data).decode("utf-8")
             data_uri = f"data:{image_mime_type};base64,{base64_image}"
 
-            messages.append({
-                "role": "user",
-                "content": [
-                    {"type": "image_url", "image_url": {"url": data_uri, "detail": "auto"}},
-                    {"type": "text", "text": user_message or PHOTO_ANALYSIS_PROMPT},
-                ],
-            })
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": data_uri, "detail": "auto"}},
+                        {"type": "text", "text": user_message or PHOTO_ANALYSIS_PROMPT},
+                    ],
+                }
+            )
         else:
             messages.append({"role": "user", "content": user_message})
 

@@ -157,10 +157,7 @@ class VoiceHandler:
             os.unlink(tmp_path)
 
         if not transcription.strip():
-            return (
-                "I couldn't make out what you said in that voice memo. "
-                "Could you try again, or type it out? 🎤"
-            )
+            return "I couldn't make out what you said in that voice memo. Could you try again, or type it out? 🎤"
 
         logger.info("voice_transcribed", transcription_len=len(transcription))
 

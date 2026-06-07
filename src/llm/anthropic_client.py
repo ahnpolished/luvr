@@ -35,14 +35,16 @@ class AnthropicClient(LLMClient):
             base64_image = base64.b64encode(image_data).decode("utf-8")
             media_type = image_mime_type
 
-            content.append({
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": media_type,
-                    "data": base64_image,
-                },
-            })
+            content.append(
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": media_type,
+                        "data": base64_image,
+                    },
+                }
+            )
 
         content.append({"type": "text", "text": user_message or PHOTO_ANALYSIS_PROMPT})
 

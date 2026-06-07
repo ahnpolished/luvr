@@ -81,13 +81,15 @@ async def test_text_handler(mock_bridge_client, mock_llm_client):
     from src.handler.text_handler import TextHandler
 
     handler = TextHandler(llm_client=mock_llm_client)
-    payload = WebhookPayload.model_validate({
-        "chatGuid": "iMessage;-;+1234567890",
-        "text": "Should I text him back?",
-        "sender": "+1234567890",
-        "isFromMe": False,
-        "attachments": [],
-    })
+    payload = WebhookPayload.model_validate(
+        {
+            "chatGuid": "iMessage;-;+1234567890",
+            "text": "Should I text him back?",
+            "sender": "+1234567890",
+            "isFromMe": False,
+            "attachments": [],
+        }
+    )
 
     response = await handler.handle(payload)
     assert len(response) > 0
@@ -101,13 +103,15 @@ async def test_text_handler_empty_message(mock_llm_client):
     from src.handler.text_handler import TextHandler
 
     handler = TextHandler(llm_client=mock_llm_client)
-    payload = WebhookPayload.model_validate({
-        "chatGuid": "iMessage;-;+1234567890",
-        "text": "",
-        "sender": "+1234567890",
-        "isFromMe": False,
-        "attachments": [],
-    })
+    payload = WebhookPayload.model_validate(
+        {
+            "chatGuid": "iMessage;-;+1234567890",
+            "text": "",
+            "sender": "+1234567890",
+            "isFromMe": False,
+            "attachments": [],
+        }
+    )
 
     response = await handler.handle(payload)
     assert "mind" in response.lower()

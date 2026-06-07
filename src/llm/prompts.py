@@ -36,7 +36,9 @@ If the image doesn't seem related to dating/relationships, gently note that and 
 
 VOICE_MEMO_SYSTEM_EXTRA = """The following is a transcription of a voice memo the user sent. They're speaking aloud about their dating/relationship situation. Respond as you normally would — warm, empathetic, and practical. Treat the transcribed text as their message to you."""
 
-ERROR_RESPONSE = "Oops, I had trouble processing that! 😅 Could you try sending it again, or maybe rephrase? I'm still learning!"
+ERROR_RESPONSE = (
+    "Oops, I had trouble processing that! 😅 Could you try sending it again, or maybe rephrase? I'm still learning!"
+)
 
 UNSUPPORTED_MEDIA_RESPONSE = (
     "Hey! I can work with text messages, photos, and voice memos — "

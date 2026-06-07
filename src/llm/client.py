@@ -90,10 +90,7 @@ def create_llm_client(provider: LLMProvider | None = None) -> LLMClient:
 
     if provider == "openai":
         if not settings.openai_api_key:
-            raise ValueError(
-                "OPENAI_API_KEY is required when using OpenAI. "
-                "Set it in your .env file or environment."
-            )
+            raise ValueError("OPENAI_API_KEY is required when using OpenAI. Set it in your .env file or environment.")
         from src.llm.openai_client import OpenAIClient
 
         logger.info("llm_client_created", provider="openai", model=settings.llm_model)
@@ -102,8 +99,7 @@ def create_llm_client(provider: LLMProvider | None = None) -> LLMClient:
     elif provider == "deepseek":
         if not settings.deepseek_api_key:
             raise ValueError(
-                "DEEPSEEK_API_KEY is required when using DeepSeek. "
-                "Set it in your .env file or environment."
+                "DEEPSEEK_API_KEY is required when using DeepSeek. Set it in your .env file or environment."
             )
         from src.llm.openai_client import OpenAIClient
 
@@ -117,8 +113,7 @@ def create_llm_client(provider: LLMProvider | None = None) -> LLMClient:
     elif provider == "anthropic":
         if not settings.anthropic_api_key:
             raise ValueError(
-                "ANTHROPIC_API_KEY is required when using Anthropic. "
-                "Set it in your .env file or environment."
+                "ANTHROPIC_API_KEY is required when using Anthropic. Set it in your .env file or environment."
             )
         from src.llm.anthropic_client import AnthropicClient
 

@@ -120,9 +120,7 @@ async def test_bot_start_webhook():
         )
         await bot.start()
 
-        mock_app.bot.set_webhook.assert_called_once_with(
-            url="https://example.com/webhook"
-        )
+        mock_app.bot.set_webhook.assert_called_once_with(url="https://example.com/webhook")
 
 
 @pytest.mark.asyncio
@@ -213,9 +211,7 @@ async def test_build_handler_calls_inner():
 
     await wrapper(mock_update, mock_context)
 
-    handler_fn.assert_called_once_with(
-        mock_update, mock_context, bridge_client=mock_bc, llm_client=mock_llm
-    )
+    handler_fn.assert_called_once_with(mock_update, mock_context, bridge_client=mock_bc, llm_client=mock_llm)
 
 
 @pytest.mark.asyncio

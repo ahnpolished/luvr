@@ -46,11 +46,15 @@ class TestParseArgs:
 
     def test_all_args(self):
         """Test all arguments together."""
-        args = parse_args([
-            "--mode", "webhook",
-            "--webhook-url", "https://example.com/webhook",
-            "--verbose",
-        ])
+        args = parse_args(
+            [
+                "--mode",
+                "webhook",
+                "--webhook-url",
+                "https://example.com/webhook",
+                "--verbose",
+            ]
+        )
         assert args.mode == "webhook"
         assert args.webhook_url == "https://example.com/webhook"
         assert args.verbose is True
@@ -90,9 +94,7 @@ class TestAsyncMain:
             patch("src.telegram_server.settings") as mock_settings,
             patch("src.telegram_server.LuvrBot") as MockBot,
         ):
-            mock_parse.return_value = MagicMock(
-                mode=None, webhook_url=None, verbose=False
-            )
+            mock_parse.return_value = MagicMock(mode=None, webhook_url=None, verbose=False)
             mock_settings.telegram_bot_token = "test-token"
             mock_settings.telegram_mode = "polling"
             mock_settings.telegram_webhook_url = None
@@ -157,9 +159,7 @@ class TestAsyncMain:
             patch("src.telegram_server.settings") as mock_settings,
             patch("src.telegram_server.LuvrBot") as MockBot,
         ):
-            mock_parse.return_value = MagicMock(
-                mode=None, webhook_url=None, verbose=False
-            )
+            mock_parse.return_value = MagicMock(mode=None, webhook_url=None, verbose=False)
             mock_settings.telegram_bot_token = "test-token"
             mock_settings.telegram_mode = "polling"
             mock_settings.telegram_webhook_url = None
@@ -189,9 +189,7 @@ class TestAsyncMain:
             patch("src.telegram_server.settings") as mock_settings,
             patch("src.telegram_server.LuvrBot") as MockBot,
         ):
-            mock_parse.return_value = MagicMock(
-                mode=None, webhook_url=None, verbose=False
-            )
+            mock_parse.return_value = MagicMock(mode=None, webhook_url=None, verbose=False)
             mock_settings.telegram_bot_token = "test-token"
             mock_settings.telegram_mode = "polling"
             mock_settings.telegram_webhook_url = None
@@ -216,9 +214,7 @@ class TestAsyncMain:
             patch("src.telegram_server.LuvrBot") as MockBot,
             patch("sys.exit") as mock_exit,
         ):
-            mock_parse.return_value = MagicMock(
-                mode=None, webhook_url=None, verbose=False
-            )
+            mock_parse.return_value = MagicMock(mode=None, webhook_url=None, verbose=False)
             mock_settings.telegram_bot_token = "test-token"
             mock_settings.telegram_mode = "polling"
             mock_settings.telegram_webhook_url = None
