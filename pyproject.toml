@@ -46,7 +46,7 @@ dev = [
     "mypy>=1.13.0",
     "deepeval>=4.0.0",
 ]
-opencode = ["opencode-ai>=0.1.0"]
+opencode = ["opencode-ai>=0.1.0a1"]
 
 [project.scripts]
 luvr-telegram = "src.telegram_server:main"
@@ -82,3 +82,7 @@ python_version = "3.12"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = "opencode_ai"
+ignore_missing_imports = true
