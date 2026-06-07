@@ -59,7 +59,7 @@ include = ["src*", "examples*", "tests*"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-addopts = "-v --cov=src --cov-report=term-missing"
+addopts = "-v --cov=src --cov-report=term-missing --ignore=tests/eval"
 markers = [
     "eval: AI evaluation case (DeepEval)",
     "slow: slow-running test (full eval suite)",

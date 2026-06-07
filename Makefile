@@ -59,12 +59,12 @@ tg-smoke-test:
 
 eval:
 	@echo "🧪 Running eval suite (deterministic metrics)..."
-	. $(VENV)/bin/activate && pytest tests/eval/ -v -m "eval and not slow" --tb=short
+	. $(VENV)/bin/activate && pytest tests/eval/ -v -o "addopts=-v --tb=short" -m "eval and not slow"
 
 eval-slow:
 	@echo "🐢 Running full eval suite (includes slow tests)..."
-	. $(VENV)/bin/activate && pytest tests/eval/ -v -m "slow" --tb=short
+	. $(VENV)/bin/activate && pytest tests/eval/ -v -o "addopts=-v --tb=short" -m "slow"
 
 eval-all:
 	@echo "🧪 Running ALL eval tests..."
-	. $(VENV)/bin/activate && pytest tests/eval/ -v --tb=short
+	. $(VENV)/bin/activate && pytest tests/eval/ -v -o "addopts=-v --tb=short"
