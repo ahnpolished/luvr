@@ -17,6 +17,7 @@ def test_settings_defaults(monkeypatch):
         bluebubbles_password="test",
         host="::",
         llm_provider="openai",
+        llm_model="gpt-4o-mini",
     )
 
     assert settings.host == "::"
