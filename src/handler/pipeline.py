@@ -11,7 +11,7 @@ from src.handler.photo_handler import PhotoHandler
 from src.handler.router import MessageRouter
 from src.handler.text_handler import TextHandler
 from src.handler.voice_handler import VoiceHandler
-from src.llm.client import create_llm_client
+from src.llm.client import LLMClient, create_llm_client
 
 logger = structlog.get_logger(__name__)
 
@@ -31,7 +31,7 @@ class MessagePipeline:
         self.router = MessageRouter()
 
         # Lazy-initialized handlers
-        self._llm_client = None
+        self._llm_client: LLMClient | None = None
         self._text_handler: TextHandler | None = None
         self._photo_handler: PhotoHandler | None = None
         self._voice_handler: VoiceHandler | None = None
@@ -61,12 +61,13 @@ class MessagePipeline:
         return self._voice_handler
 
     @property
-    def llm_client(self):
+    def llm_client(self) -> LLMClient:
         if self._llm_client is None:
             self._llm_client = create_llm_client()
+        assert self._llm_client is not None  # type guard for mypy
         return self._llm_client
 
-    async def process(self, raw_payload: dict) -> None:
+    async def process(self, raw_payload: dict[str, object]) -> None:
         """Process an incoming webhook payload from BlueBubbles.
 
         Args:
@@ -87,7 +88,8 @@ class MessagePipeline:
             # Extract the inner data payload before model validation.
             if "data" in raw_payload:
                 inner = raw_payload["data"]
-                raw_payload = inner
+                if isinstance(inner, dict):
+                    raw_payload = inner
 
             # Model validation — catch Pydantic errors separately so we can log
             # the offending fields, then bail out gracefully.

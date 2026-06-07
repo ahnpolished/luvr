@@ -15,7 +15,6 @@ import httpx
 import structlog
 
 from src.bridge.models import SendMessageResponse
-from src.config import settings
 
 logger = structlog.get_logger(__name__)
 

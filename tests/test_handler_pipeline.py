@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from src.bridge.models import WebhookPayload
 from src.handler.pipeline import MessagePipeline
 from src.handler.router import MessageRouter
@@ -76,8 +77,8 @@ async def test_pipeline_skips_own_messages(
 @pytest.mark.asyncio
 async def test_text_handler(mock_bridge_client, mock_llm_client):
     """Test text handler generates and sends response."""
-    from src.handler.text_handler import TextHandler
     from src.bridge.models import WebhookPayload
+    from src.handler.text_handler import TextHandler
 
     handler = TextHandler(llm_client=mock_llm_client)
     payload = WebhookPayload.model_validate({
@@ -96,8 +97,8 @@ async def test_text_handler(mock_bridge_client, mock_llm_client):
 @pytest.mark.asyncio
 async def test_text_handler_empty_message(mock_llm_client):
     """Test text handler returns greeting for empty messages."""
-    from src.handler.text_handler import TextHandler
     from src.bridge.models import WebhookPayload
+    from src.handler.text_handler import TextHandler
 
     handler = TextHandler(llm_client=mock_llm_client)
     payload = WebhookPayload.model_validate({

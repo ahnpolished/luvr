@@ -1,4 +1,4 @@
-.PHONY: install run test lint format clean smoke-test setup run-telegram test-cov tg-smoke-test
+.PHONY: install run test lint format clean smoke-test setup run-telegram test-cov tg-smoke-test eval eval-slow eval-all
 
 # Default Python
 PYTHON := python3
@@ -56,3 +56,15 @@ test-cov:
 tg-smoke-test:
 	@echo "💨 Running Telegram smoke tests..."
 	. $(VENV)/bin/activate && python scripts/telegram_smoke_test.py
+
+eval:
+	@echo "🧪 Running eval suite (deterministic metrics)..."
+	. $(VENV)/bin/activate && pytest tests/eval/ -v -m "eval and not slow" --tb=short
+
+eval-slow:
+	@echo "🐢 Running full eval suite (includes slow tests)..."
+	. $(VENV)/bin/activate && pytest tests/eval/ -v -m "slow" --tb=short
+
+eval-all:
+	@echo "🧪 Running ALL eval tests..."
+	. $(VENV)/bin/activate && pytest tests/eval/ -v --tb=short

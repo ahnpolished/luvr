@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
 from src.telegram_server import parse_args
 
 
@@ -237,7 +238,7 @@ class TestAsyncMain:
 def test_main_function():
     """Test the synchronous main() entrypoint."""
     with (
-        patch("src.telegram_server.async_main", new=AsyncMock()) as mock_am,
+        patch("src.telegram_server.async_main", new=AsyncMock()),
         patch("asyncio.run") as mock_run,
     ):
         from src.telegram_server import main

@@ -7,7 +7,7 @@ import base64
 import structlog
 from anthropic import APIError, AsyncAnthropic
 
-from src.llm.client import LLMClient, LLMAPIError, LLMContentFilterError
+from src.llm.client import LLMAPIError, LLMClient, LLMContentFilterError
 from src.llm.prompts import DATING_ADVISOR_SYSTEM_PROMPT, PHOTO_ANALYSIS_PROMPT
 
 logger = structlog.get_logger(__name__)
@@ -33,7 +33,7 @@ class AnthropicClient(LLMClient):
         content: list[dict[str, object]] = []
         if image_data and image_mime_type:
             base64_image = base64.b64encode(image_data).decode("utf-8")
-            media_type = mime_type
+            media_type = image_mime_type
 
             content.append({
                 "type": "image",
@@ -53,7 +53,7 @@ class AnthropicClient(LLMClient):
                 model=self.model,
                 max_tokens=600,
                 system=system,
-                messages=[{"role": "user", "content": content}],  # type: ignore[arg-type]
+                messages=[{"role": "user", "content": content}],  # type: ignore[typeddict-item]
                 temperature=0.85,
             )
 
@@ -101,7 +101,7 @@ class AnthropicClient(LLMClient):
                 model=self.model,
                 max_tokens=600,
                 system=DATING_ADVISOR_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": content}],  # type: ignore[arg-type]
+                messages=[{"role": "user", "content": content}],  # type: ignore[typeddict-item]
                 temperature=0.85,
             )
 

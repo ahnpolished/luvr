@@ -7,7 +7,7 @@ import base64
 import structlog
 from openai import APIError, AsyncOpenAI
 
-from src.llm.client import LLMClient, LLMAPIError, LLMContentFilterError
+from src.llm.client import LLMAPIError, LLMClient, LLMContentFilterError
 from src.llm.prompts import DATING_ADVISOR_SYSTEM_PROMPT, PHOTO_ANALYSIS_PROMPT
 
 logger = structlog.get_logger(__name__)

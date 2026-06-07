@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 from src.config import Settings
 
 
@@ -64,14 +63,15 @@ def test_telegram_bot_token_set():
     assert settings.telegram_bot_token == "12345:abcde"
 
 
-def test_allowed_user_ids_empty():
-    """Test allowed_user_ids defaults to empty string."""
+def test_allowed_user_ids_default_empty():
+    """Test allowed_user_ids defaults to empty string and parses as empty list."""
     settings = Settings(
         _env_file=None,
         bluebubbles_server_url="http://test:1234",
         bluebubbles_password="test",
     )
     assert settings.telegram_allowed_user_ids == ""
+    assert settings.telegram_allowed_user_id_list == []
 
 
 def test_allowed_user_ids_parsing():
@@ -83,17 +83,6 @@ def test_allowed_user_ids_parsing():
         telegram_allowed_user_ids="123, 456 , 789",
     )
     assert settings.telegram_allowed_user_id_list == [123, 456, 789]
-
-
-def test_allowed_user_ids_empty():
-    """Test telegram_allowed_user_id_list with empty string."""
-    settings = Settings(
-        _env_file=None,
-        bluebubbles_server_url="http://test:1234",
-        bluebubbles_password="test",
-        telegram_allowed_user_ids="",
-    )
-    assert settings.telegram_allowed_user_id_list == []
 
 
 def test_allowed_user_ids_invalid():

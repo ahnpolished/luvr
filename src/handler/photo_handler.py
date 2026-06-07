@@ -13,6 +13,7 @@ from src.llm.client import LLMClient
 from src.llm.prompts import UNSUPPORTED_MEDIA_RESPONSE
 
 if TYPE_CHECKING:
+    from src.telegram.bridge_client import TelegramBridgeClient
     from src.telegram.models import InternalMessage
 
 logger = structlog.get_logger(__name__)
@@ -23,7 +24,7 @@ SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/heic", "image/webp", 
 class PhotoHandler:
     """Handles photo/image messages by analyzing them with vision LLM."""
 
-    def __init__(self, bridge_client: BlueBubblesClient, llm_client: LLMClient) -> None:
+    def __init__(self, bridge_client: BlueBubblesClient | TelegramBridgeClient, llm_client: LLMClient) -> None:
         self.bridge_client = bridge_client
         self.llm_client = llm_client
 
@@ -82,7 +83,10 @@ class PhotoHandler:
 
         except Exception:
             logger.exception("photo_processing_error")
-            return "I had trouble analyzing that image. Could you try sending it again, or describe what you wanted me to look at? 🧐"
+            return (
+                "I had trouble analyzing that image. "
+                "Could you try sending it again, or describe what you wanted me to look at? 🧐"
+            )
 
     async def _handle_internal(self, msg: InternalMessage) -> str:
         """Process an InternalMessage (Telegram path) containing a photo.
@@ -130,4 +134,7 @@ class PhotoHandler:
             return "I couldn't find that photo. Could you send it again? 📸"
         except Exception:
             logger.exception("photo_processing_error")
-            return "I had trouble analyzing that image. Could you try sending it again, or describe what you wanted me to look at? 🧐"
+            return (
+                "I had trouble analyzing that image. "
+                "Could you try sending it again, or describe what you wanted me to look at? 🧐"
+            )

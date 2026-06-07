@@ -45,7 +45,7 @@ class LuvrBot:
         # Core components (lazy-initialized in start)
         self._llm_client: LLMClient | None = None
         self._bridge_client: TelegramBridgeClient | None = None
-        self._app: Application | None = None
+        self._app: Application[object, object, object, object] | None = None  # type: ignore[type-arg]
 
     # ------------------------------------------------------------------
     # Properties
@@ -66,7 +66,7 @@ class LuvrBot:
         return self._bridge_client
 
     @property
-    def app(self) -> Application:
+    def app(self) -> Application[object, object, object, object]:  # type: ignore[type-arg]
         """Return the telegram Application (must be started first)."""
         if self._app is None:
             raise RuntimeError("Bot not started. Call start() first.")
@@ -97,6 +97,7 @@ class LuvrBot:
             # Polling mode
             await self._app.initialize()
             await self._app.start()
+            assert self._app.updater is not None
             await self._app.updater.start_polling()
 
         logger.info("luvr_telegram_ready", mode=self.mode)
@@ -147,7 +148,7 @@ class LuvrBot:
 # Handler registration
 # ------------------------------------------------------------------
 
-def _register_handlers(app: Application) -> None:
+def _register_handlers(app: Application[object, object, object, object]) -> None:  # type: ignore[type-arg]
     """Register all Telegram message handlers on the Application."""
     # /start command
     app.add_handler(CommandHandler("start", handle_start))

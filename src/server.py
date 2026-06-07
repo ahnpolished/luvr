@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import structlog
@@ -21,7 +22,7 @@ message_pipeline: MessagePipeline
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Application lifecycle: startup and shutdown events."""
     global bridge_client, message_pipeline
 
@@ -50,13 +51,13 @@ app = FastAPI(
 
 
 @app.get("/health")
-async def health_check():
+async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "ok", "service": "luvr", "version": "0.1.0"}
 
 
 @app.post("/webhook")
-async def webhook(request: Request):
+async def webhook(request: Request) -> JSONResponse:
     """Receive incoming iMessage webhook from BlueBubbles.
 
     BlueBubbles forwards new messages to this endpoint as JSON payloads.

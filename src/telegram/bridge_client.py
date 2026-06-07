@@ -12,8 +12,6 @@ from typing import Any
 
 import structlog
 
-from src.config import settings
-
 logger = structlog.get_logger(__name__)
 
 

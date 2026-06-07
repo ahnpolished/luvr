@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
-from src.llm.client import LLMClient, LLMError, create_llm_client
+
+from src.llm.client import LLMClient, create_llm_client
 from src.llm.prompts import (
     DATING_ADVISOR_SYSTEM_PROMPT,
-    ERROR_RESPONSE,
     PHOTO_ANALYSIS_PROMPT,
 )
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from src.bridge.client import BlueBubblesClient
 
 
@@ -24,7 +25,7 @@ def test_client_lazy_init():
         password="test_password",
     )
     assert client._client is None
-    c = client.client  # Access triggers init
+    _ = client.client  # Access triggers init
     assert client._client is not None
 
 

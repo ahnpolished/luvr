@@ -7,12 +7,12 @@ pipeline, allowing the same LLM handlers to process Telegram messages.
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class TelegramMessageType(str, Enum):
+class TelegramMessageType(StrEnum):
     """Type of a Telegram message as relevant to Luvr's processing pipeline."""
 
     TEXT = "text"

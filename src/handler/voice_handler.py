@@ -14,6 +14,7 @@ from src.llm.prompts import UNSUPPORTED_MEDIA_RESPONSE, VOICE_MEMO_SYSTEM_EXTRA
 from src.media.transcription import transcribe_audio
 
 if TYPE_CHECKING:
+    from src.telegram.bridge_client import TelegramBridgeClient
     from src.telegram.models import InternalMessage
 
 logger = structlog.get_logger(__name__)
@@ -33,7 +34,7 @@ SUPPORTED_AUDIO_TYPES = {
 class VoiceHandler:
     """Handles voice memo/audio messages by transcribing them and generating advice."""
 
-    def __init__(self, bridge_client: BlueBubblesClient, llm_client: LLMClient) -> None:
+    def __init__(self, bridge_client: BlueBubblesClient | TelegramBridgeClient, llm_client: LLMClient) -> None:
         self.bridge_client = bridge_client
         self.llm_client = llm_client
 
