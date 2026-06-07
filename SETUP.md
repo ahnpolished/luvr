@@ -1,16 +1,24 @@
 # Luvr Setup Guide
 
-> Step-by-step guide to getting Luvr running locally on your Mac.
+> Step-by-step guide to getting Luvr running locally — choose iMessage or Telegram.
+
+**Not on a Mac? No problem!** The Telegram version works on any OS (Linux, Windows, macOS).
 
 ## Prerequisites Checklist
 
 Before starting, make sure you have:
 
-- [ ] **Mac** running macOS (Monterey or later)
-- [ ] **iMessage** signed in with an Apple ID on your Mac
 - [ ] **Python 3.12+** installed (`python3 --version`)
 - [ ] **Git** installed (`git --version`)
-- [ ] An **OpenAI API key** (https://platform.openai.com/api-keys) **or** **Anthropic API key** (https://console.anthropic.com)
+- [ ] An **LLM API key** — at least one of:
+  - **OpenAI API key** (https://platform.openai.com/api-keys)
+  - **Anthropic API key** (https://console.anthropic.com)
+  - **DeepSeek API key** (https://platform.deepseek.com)
+  - **OpenCode server** (local, no external API key needed)
+
+**For iMessage only** (Telegram doesn't need these):
+- [ ] **Mac** running macOS (Monterey or later)
+- [ ] **iMessage** signed in with an Apple ID on your Mac
 
 ## Step 1: Clone & Install Luvr
 
@@ -28,20 +36,92 @@ This creates a virtual environment and installs all dependencies.
 cp .env.example .env
 ```
 
-Edit `.env` with your actual values:
+Edit `.env` with your actual values.
 
+### Choose your platform
+
+**For Telegram** (easiest, no Mac needed):
 ```env
-# Required: BlueBubbles connection
-BLUEBUBBLES_SERVER_URL=http://localhost:1234
-BLUEBUBBLES_PASSWORD=your_bluebubbles_password
-
-# Required: Choose your LLM provider
-LLM_PROVIDER=openai            # or "anthropic"
-OPENAI_API_KEY=sk-...          # if using OpenAI
-ANTHROPIC_API_KEY=sk-ant-...   # if using Anthropic
+PLATFORM=telegram
+TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather
 ```
 
-## Step 3: Install BlueBubbles
+**For iMessage** (requires Mac + BlueBubbles):
+```env
+PLATFORM=imessage
+BLUEBUBBLES_SERVER_URL=http://localhost:1234
+BLUEBUBBLES_PASSWORD=your_bluebubbles_password
+```
+
+### Choose your LLM provider
+
+```env
+# Option A: OpenAI (default)
+LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+LLM_MODEL=gpt-4o-mini
+
+# Option B: Anthropic Claude
+LLM_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+LLM_MODEL=claude-3-haiku-20240307
+
+# Option C: DeepSeek
+LLM_PROVIDER=deepseek
+DEEPSEEK_API_KEY=sk-...
+LLM_MODEL=deepseek-chat
+
+# Option D: OpenCode (local gateway)
+LLM_PROVIDER=opencode
+OPENCODE_BASE_URL=http://localhost:54321
+OPENCODE_PROVIDER_ID=deepseek
+LLM_MODEL=deepseek-chat
+```
+
+## 🚀 Telegram Setup
+
+### 1. Create a Telegram Bot
+
+1. Open Telegram and chat with [@BotFather](https://t.me/BotFather)
+2. Send `/newbot` and follow the prompts
+3. Copy the bot token (looks like `123456:ABCdef...`)
+
+### 2. Configure
+
+```bash
+# In your .env file:
+PLATFORM=telegram
+TELEGRAM_BOT_TOKEN=your_token_from_botfather
+LLM_PROVIDER=openai          # or anthropic, deepseek, opencode
+OPENAI_API_KEY=sk-your-key   # whichever provider you chose
+```
+
+### 3. (Optional) Restrict Users
+
+To only allow specific Telegram users:
+```env
+TELEGRAM_ALLOWED_USER_IDS=123456789,987654321
+```
+
+### 4. Run
+
+```bash
+# Polling mode (default, simplest)
+make run-telegram
+
+# Or webhook mode for production
+luvr-telegram --mode webhook --webhook-url https://your-domain.com/webhook
+```
+
+### 5. Chat!
+
+Find your bot on Telegram and send `/start`!
+
+---
+
+## 💬 iMessage Setup (Mac only)
+
+### Step 3: Install BlueBubbles
 
 BlueBubbles is the bridge between iMessage and the Luvr bot.
 
@@ -168,6 +248,16 @@ Record a voice memo in iMessage and send it. The bot will transcribe and respond
 2. Check the audio file size (max 25MB by default)
 3. Use shorter voice memos for testing
 
+## 🧪 Running Evaluation Tests
+
+Luvr includes a DeepEval-based evaluation suite for AI quality and safety testing:
+
+```bash
+make eval         # Fast deterministic metric tests (no API keys needed)
+make eval-slow    # Full suite including LLM-dependent tests
+make eval-all     # Run everything
+```
+
 ## Next Steps
 
 - [ ] Set up multiple users (v0.2.0)
@@ -180,4 +270,5 @@ Record a voice memo in iMessage and send it. The bot will transcribe and respond
 
 - **Issues**: https://github.com/ahnpolished/luvr/issues
 - **BlueBubbles docs**: https://docs.bluebubbles.app
+- **Telegram Bot docs**: https://core.telegram.org/bots
 - **Linear project**: https://linear.app/humphreyahn/project/luvr-3b2084037dfc

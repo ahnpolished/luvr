@@ -7,11 +7,11 @@ import signal
 from typing import Any
 
 import structlog
-from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters
 
 from src.llm.client import LLMClient, create_llm_client
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.handlers import handle_photo, handle_start, handle_text, handle_voice
+from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters
 
 logger = structlog.get_logger(__name__)
 

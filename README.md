@@ -31,7 +31,7 @@ The Telegram version is the easiest way to get started. Just create a bot with @
 
 The iMessage version uses BlueBubbles to bridge iMessage to a REST API, allowing Luvr to read and respond to your iMessages on any device.
 
-LLM-powered by GPT-4o-mini or Claude.
+LLM-powered by OpenAI, Anthropic Claude, DeepSeek, or OpenCode (local LLM gateway).
 
 ## 🏗️ Architecture
 
@@ -192,10 +192,11 @@ Open Telegram, find your bot, and send `/start`!
 ## 🛠️ Tech Stack
 
 - **Bridges**: [BlueBubbles](https://bluebubbles.app) (iMessage) | [python-telegram-bot](https://python-telegram-bot.org) (Telegram)
-- **Server**: FastAPI + uvicorn (iMessage) | python-telegram-bot polling (Telegram)
-- **LLM**: OpenAI GPT-4o-mini (primary) or Anthropic Claude 3 Haiku
-- **Vision**: Native vision capabilities in both models
+- **Server**: FastAPI + uvicorn (iMessage) | python-telegram-bot polling/webhook (Telegram)
+- **LLM**: OpenAI GPT-4o-mini, Anthropic Claude, DeepSeek, or OpenCode (local gateway)
+- **Vision**: Native vision capabilities in OpenAI and Anthropic models
 - **Transcription**: OpenAI Whisper
+- **Eval**: DeepEval for AI quality & safety testing
 - **Config**: pydantic-settings + python-dotenv
 
 ## 📁 Project Structure
@@ -203,13 +204,21 @@ Open Telegram, find your bot, and send `/start`!
 ```
 luvr/
 ├── src/
-│   ├── server.py              # FastAPI app entrypoint
+│   ├── server.py              # FastAPI app entrypoint (iMessage)
+│   ├── telegram_server.py     # Telegram bot entrypoint
 │   ├── config.py              # Centralized settings
 │   ├── logging_config.py      # Structured logging
-│   ├── bridge/                # BlueBubbles API client
+│   ├── bridge/                # BlueBubbles API client (iMessage)
 │   │   ├── client.py          # Async HTTP client
 │   │   └── models.py          # Pydantic models
-│   ├── handler/               # Message processing
+│   ├── telegram/              # Telegram bot module
+│   │   ├── bot.py             # Bot lifecycle + handler registration
+│   │   ├── handlers.py        # Message handlers (text/photo/voice)
+│   │   ├── bridge_client.py   # Telegram reply API client
+│   │   ├── models.py          # Internal message models
+│   │   ├── cli.py             # CLI wrapper
+│   │   └── __main__.py        # Entry point
+│   ├── handler/               # Message processing (iMessage)
 │   │   ├── pipeline.py        # Orchestrator
 │   │   ├── router.py          # Message type router
 │   │   ├── text_handler.py    # Text messages
@@ -219,14 +228,19 @@ luvr/
 │   │   ├── client.py          # Abstract interface + factory
 │   │   ├── openai_client.py   # OpenAI implementation
 │   │   ├── anthropic_client.py # Claude implementation
+│   │   ├── opencode_client.py # OpenCode (local gateway) impl
 │   │   └── prompts.py         # System prompts
 │   └── media/                 # Media processing
 │       ├── vision.py          # Image analysis
 │       └── transcription.py   # Whisper transcription
 ├── tests/                     # Test suite
+│   └── eval/                  # DeepEval AI quality tests
 ├── scripts/                   # Utility scripts
 │   ├── setup.sh               # One-command setup
-│   └── smoke_test.py          # End-to-end smoke tests
+│   ├── smoke_test.py          # iMessage smoke tests
+│   └── telegram_smoke_test.py # Telegram smoke tests
+├── examples/                  # Example usage
+│   └── telegram_bot.py        # Standalone Telegram example
 ├── Makefile                   # Common commands
 ├── pyproject.toml             # Python project config
 └── .env.example               # Configuration template
@@ -235,12 +249,18 @@ luvr/
 ## 🔧 Development
 
 ```bash
-make install     # Install dependencies
-make run         # Start development server
-make test        # Run tests
-make lint        # Run linter
-make format      # Format code
-make smoke-test  # Run smoke tests (needs API keys)
+make install       # Install dependencies
+make run           # Start iMessage server
+make run-telegram  # Start Telegram bot
+make test          # Run tests
+make test-cov      # Run tests with coverage report
+make lint          # Run linter
+make format        # Format code
+make smoke-test    # Run iMessage smoke tests (needs API keys)
+make tg-smoke-test # Run Telegram smoke tests (no API keys needed)
+make eval          # Run eval suite (fast deterministic tests)
+make eval-slow     # Run full eval suite (includes slow tests)
+make eval-all      # Run ALL eval tests
 ```
 
 ## 🗺️ Roadmap
