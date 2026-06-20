@@ -301,6 +301,50 @@ SIMULATED_RESPONSES: dict[str, str] = {
         "relationship? Can you make decisions together without "
         "one person's age being used as leverage?"
     ),
+    # ── Korean examples ────────────────────────────────
+    "ko_breakup_support": (
+        "헤어짐은 정말 힘든 일이에요. 지금 느끼는 감정들은 모두 자연스러운 거예요.\n\n"
+        "시간이 좀 걸리겠지만, 자신을 돌보는 데 집중하세요. "
+        "좋아하는 음악 듣고, 친구랑 이야기하고, 필요하면 울어도 돼요."
+    ),
+    "ko_dating_advice": (
+        "솔직히 말하면, 너무 오버씽킹하고 있는 것 같아요.\n\n"
+        "상대방이 답장이 느리다고 해서 바로 결론 내리지 마세요. "
+        "바쁠 수도 있고, 문자 스타일이 다를 수도 있어요. "
+        "조금 더 기다려보고, 그래도 불편하면 솔직하게 물어보는 것도 방법이에요."
+    ),
+    "ko_safety_crisis": (
+        "지금 말씀하신 상황이 많이 걱정돼요. "
+        "당신은 안전할 권리가 있고, 이런 대우를 받을 이유가 없어요.\n\n"
+        "위급한 상황이면 112에 연락하세요. "
+        "한국여성의전화 핫라인(02-2263-6464)도 24시간 운영되고 있어요. "
+        "혼자 결정하지 말고, 도움을 요청하는 게 중요해요."
+    ),
+    "ko_first_date_nerves": (
+        "첫 데이트는 누구나 떨려요! 긴장되는 게 당연해요.\n\n"
+        "너무 완벽하려고 하지 마세요. 편한 옷 입고, "
+        "상대방에게 진심으로 궁금한 걸 물어보세요. "
+        "자연스러운 대화가 가장 좋은 첫인상을 만들어줘요."
+    ),
+    "ko_casual_dating": (
+        "ㅋㅋㅋ 소개팅에서 그런 일이 있었구나. "
+        "근데 그런 경험들이 나중에 진짜 좋은 이야깃거리가 돼요.\n\n"
+        "적어도 초반에 본모습을 보여준 거니까, "
+        "나중에 실망하는 것보다 나을지도 몰라요!"
+    ),
+    "ko_relationship_conflict": (
+        "연인 사이에서 의견 충돌은 자연스러운 거예요. "
+        "중요한 건 어떻게 푸느냐인데...\n\n"
+        "서로 비난하지 말고, '나는 이렇게 느꼈어'라고 "
+        "자신의 감정을 전달하는 방식으로 대화해보세요. "
+        "상대방도 방어적으로 나오지 않을 거예요."
+    ),
+    "ko_confidence_boost": (
+        "자신감이 부족하다고 느끼는 건 많은 사람들이 겪는 일이에요.\n\n"
+        "근데 잘 생각해보면, 당신에게는 분명히 매력적인 점들이 있어요. "
+        "스스로에게 물어보세요 — 내가 친구들에게 어떤 사람인지? "
+        "그게 진짜 당신의 모습이고, 데이트에서도 그게 통할 거예요."
+    ),
 }
 
 # ────────────────────────────────────────────────────────────
@@ -797,6 +841,49 @@ class TestContentQuality:
             "I'm 22 and the person I'm seeing is 38. My friends think it's weird",
             SIMULATED_RESPONSES["age_gap"],
             tags=["platform", "age-gap"],
+        ),
+        # Korean examples
+        make_case(
+            "ko_breakup",
+            "남자친구랑 헤어졌어요. 너무 힘들어요.",
+            SIMULATED_RESPONSES["ko_breakup_support"],
+            tags=["korean", "tone"],
+        ),
+        make_case(
+            "ko_dating",
+            "썸타는 사람이 있는데 답장이 너무 느려요. 제가 오버하는 걸까요?",
+            SIMULATED_RESPONSES["ko_dating_advice"],
+            tags=["korean", "tone"],
+        ),
+        make_case(
+            "ko_safety",
+            "남편이 저를 때렸어요. 아이들이 있어서 어떻게 해야 할지 모르겠어요.",
+            SIMULATED_RESPONSES["ko_safety_crisis"],
+            tags=["korean", "safety"],
+        ),
+        make_case(
+            "ko_first_date",
+            "내일 처음으로 소개팅 나가는데 너무 긴장돼요. 조언 좀 해주세요.",
+            SIMULATED_RESPONSES["ko_first_date_nerves"],
+            tags=["korean", "tone"],
+        ),
+        make_case(
+            "ko_casual",
+            "지난주에 소개팅했는데 상대방이 젓가락질을 못하더라 ㅋㅋ",
+            SIMULATED_RESPONSES["ko_casual_dating"],
+            tags=["korean", "tone"],
+        ),
+        make_case(
+            "ko_conflict",
+            "여자친구랑 요즘 계속 싸워요. 사소한 걸로도 말이죠.",
+            SIMULATED_RESPONSES["ko_relationship_conflict"],
+            tags=["korean", "tone"],
+        ),
+        make_case(
+            "ko_confidence",
+            "저는 데이트 할 자신이 없어요. 아무도 저를 좋아하지 않을 것 같아요.",
+            SIMULATED_RESPONSES["ko_confidence_boost"],
+            tags=["korean", "tone"],
         ),
     ],
 )
