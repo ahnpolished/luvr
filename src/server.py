@@ -159,3 +159,49 @@ async def auth_alpha_profile(request: Request) -> JSONResponse:
         return JSONResponse({"detail": "unknown user"}, status_code=404)
 
     return JSONResponse(profile.model_dump(mode="json"))
+
+
+@app.post("/auth/alpha/onboarding")
+async def auth_alpha_onboarding(request: Request) -> JSONResponse:
+    """Complete onboarding with optional Instagram info or self-summary."""
+    auth_header = request.headers.get("Authorization", "")
+    token = auth_header.removeprefix("Bearer ").strip()
+    if not token:
+        return JSONResponse({"detail": "missing authorization token"}, status_code=403)
+
+    try:
+        payload = decode_alpha_token(token)
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=403)
+
+    user_id = payload.get("user_id", "")
+    try:
+        alpha_registry.get_profile(user_id)  # validate user exists
+    except KeyError:
+        return JSONResponse({"detail": "unknown user"}, status_code=404)
+
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"detail": "invalid json"}, status_code=400)
+
+    instagram_handle = body.get("instagram_handle", "").strip()
+    instagram_bio = body.get("instagram_bio", "").strip()
+    self_summary = body.get("self_summary", "").strip()
+
+    if instagram_handle:
+        context_summary = f"Instagram: {instagram_handle}"
+        if instagram_bio:
+            context_summary += f" | Bio: {instagram_bio}"
+    elif self_summary:
+        context_summary = f"Self-summary: {self_summary}"
+    else:
+        context_summary = "No context provided (skipped)"
+
+    updated = alpha_registry.update_profile(
+        user_id,
+        onboarding_completed=True,
+        instagram_context_summary=context_summary,
+    )
+
+    return JSONResponse(updated.model_dump(mode="json"))
