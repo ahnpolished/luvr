@@ -68,3 +68,7 @@ eval-slow:
 eval-all:
 	@echo "🧪 Running ALL eval tests..."
 	. $(VENV)/bin/activate && pytest tests/eval/ -v -o "addopts=-v --tb=short"
+
+generate-tarot-images:
+	@echo "🃏 Generating Major Arcana tarot card images..."
+	. $(VENV)/bin/activate && python scripts/generate_tarot_images.py
