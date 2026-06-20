@@ -36,7 +36,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "~> 1.5"
+          terraform_version: "~> 1.6"
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive ../../
@@ -45,15 +45,13 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-            -backend-config="endpoints={s3=${{ secrets.R2_ENDPOINT }}}" \
+            -backend-config="endpoint=${{ secrets.R2_ENDPOINT }}" \
             -backend-config="access_key=${{ secrets.R2_ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.R2_SECRET_KEY }}" \
             -backend-config="region=auto" \
             -backend-config="skip_credentials_validation=true" \
             -backend-config="skip_region_validation=true" \
-            -backend-config="skip_requesting_account_id=true" \
-            -backend-config="skip_metadata_api_check=true" \
-            -backend-config="skip_s3_checksum=true"
+            -backend-config="skip_metadata_api_check=true"
 
       - name: Terraform Validate
         run: terraform validate
