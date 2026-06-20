@@ -1,0 +1,28 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "nixpacks"
+  },
+  "services": {
+    "api": {
+      "build": {
+        "builder": "nixpacks"
+      },
+      "deploy": {
+        "startCommand": "uvicorn src.server:app --host 0.0.0.0 --port ${PORT:-8000}",
+        "healthcheckPath": "/health",
+        "restartPolicyType": "ON_FAILURE"
+      }
+    },
+    "telegram-worker": {
+      "build": {
+        "builder": "nixpacks"
+      },
+      "deploy": {
+        "startCommand": "python -m src.telegram_server",
+        "healthcheckPath": null,
+        "restartPolicyType": "ON_FAILURE"
+      }
+    }
+  }
+}
