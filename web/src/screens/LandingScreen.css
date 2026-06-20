@@ -1,0 +1,288 @@
+.lv-landing__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 44px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.lv-landing__wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 25px;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.lv-landing__logo {
+  width: 28px;
+  height: 28px;
+}
+
+.lv-landing__dot {
+  color: var(--color-accent);
+}
+
+.lv-landing__nav-links {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.lv-landing__nav-links a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.lv-landing__hero {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  padding: 80px 44px 72px;
+}
+
+.lv-landing__hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.lv-landing__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 26px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-text-faint);
+}
+
+.lv-landing__dot-mark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  display: inline-block;
+}
+
+.lv-landing__hero-copy h1 {
+  font-size: 60px;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  margin: 0 0 28px;
+  max-width: 11ch;
+  text-wrap: balance;
+}
+
+.lv-landing__lede {
+  font-size: 20px;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  margin: 0 0 38px;
+  max-width: 46ch;
+}
+
+.lv-landing__cta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.lv-landing__fineprint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-faint);
+  letter-spacing: 0.02em;
+}
+
+.lv-landing__chat {
+  background: linear-gradient(165deg, #ffffff, var(--color-accent-tint));
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.lv-landing__chat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.lv-landing__chat-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+}
+
+.lv-landing__chat-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.lv-landing__chat-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-faint);
+}
+
+.lv-landing__bubble {
+  max-width: 88%;
+  padding: 13px 16px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.lv-landing__bubble--user {
+  align-self: flex-end;
+  max-width: 82%;
+  background: var(--color-text);
+  color: #fafafa;
+  border-radius: 20px 20px 6px 20px;
+}
+
+.lv-landing__bubble--luvr {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text);
+  border-radius: 20px 20px 20px 6px;
+}
+
+.lv-landing__section {
+  padding: 8px 44px 64px;
+}
+
+.lv-landing__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.lv-landing__step-card {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.lv-landing__step-number {
+  font-family: var(--font-display);
+  font-size: 34px;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+
+.lv-landing__step-card h3 {
+  font-size: 20px;
+  color: var(--color-text);
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+}
+
+.lv-landing__step-card p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+}
+
+.lv-landing__quote-panel {
+  background: linear-gradient(150deg, var(--color-surface-alt), var(--color-accent-tint));
+  border-radius: var(--radius-lg);
+  padding: 48px 44px;
+}
+
+.lv-landing__quote-panel blockquote {
+  margin: 0;
+  border-left: 4px solid var(--color-brand);
+  padding-left: 28px;
+  max-width: 62ch;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1.42;
+  color: var(--color-text);
+}
+
+.lv-landing__channels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.lv-landing__channel-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-card);
+}
+
+.lv-landing__channel-card--muted {
+  opacity: 0.75;
+}
+
+.lv-landing__channel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lv-landing__channel-head h3 {
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.lv-landing__badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #16a34a;
+  background: #eaf7ee;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+}
+
+.lv-landing__badge--soon {
+  color: var(--color-text-faint);
+  background: var(--color-surface-alt);
+}
+
+@media (max-width: 860px) {
+  .lv-landing__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .lv-landing__grid,
+  .lv-landing__channels {
+    grid-template-columns: 1fr;
+  }
+
+  .lv-landing__nav-links {
+    gap: 16px;
+  }
+}

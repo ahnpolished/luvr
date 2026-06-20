@@ -1,0 +1,28 @@
+.lv-pageshell {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.lv-pageshell__glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% -10%, var(--color-brand-tint), transparent 60%),
+    radial-gradient(circle at 95% 30%, var(--color-accent-tint), transparent 55%);
+}
+
+.lv-pageshell__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}

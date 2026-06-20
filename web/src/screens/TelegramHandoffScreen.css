@@ -1,0 +1,47 @@
+.lv-handoff__body {
+  padding: 38px 28px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+}
+
+.lv-handoff__body h2 {
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.lv-handoff__lede {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+}
+
+.lv-handoff__link-box {
+  margin-top: 12px;
+  padding: 16px 18px;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lv-handoff__link-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-faint);
+}
+
+.lv-handoff__link {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-brand);
+  word-break: break-all;
+}

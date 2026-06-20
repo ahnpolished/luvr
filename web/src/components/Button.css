@@ -1,0 +1,67 @@
+.lv-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: filter 0.15s ease, background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.lv-button--md {
+  height: 52px;
+  padding: 0 28px;
+  font-size: 15px;
+}
+
+.lv-button--lg {
+  height: 58px;
+  padding: 0 32px;
+  font-size: 16px;
+}
+
+.lv-button--full {
+  width: 100%;
+}
+
+.lv-button--primary {
+  background: var(--color-brand);
+  color: #ffffff;
+  box-shadow: var(--shadow-button);
+}
+
+.lv-button--primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.lv-button--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.lv-button--secondary:hover:not(:disabled) {
+  background: var(--color-surface-alt);
+}
+
+.lv-button--ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+  padding: 8px 0;
+  height: auto;
+  box-shadow: none;
+}
+
+.lv-button--ghost:hover:not(:disabled) {
+  color: var(--color-brand);
+}
+
+.lv-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  filter: none;
+}
