@@ -440,3 +440,176 @@ async def test_handle_voice_handler_error():
 
         msg.reply_text.assert_called_once()
         assert "trouble processing" in msg.reply_text.call_args[0][0].lower()
+
+
+@pytest.mark.asyncio
+async def test_handle_voice_sends_voice_reply_when_tts_enabled():
+    """Test that voice handler sends a TTS voice reply when enabled."""
+    voice = MagicMock(spec=Voice)
+    voice.file_id = "voice_reply"
+    voice.file_size = 30000
+    voice.duration = 15
+    voice.mime_type = "audio/ogg"
+
+    msg = _mock_message(voice=voice)
+    update = _mock_update(msg)
+
+    mock_bc, mock_llm = _setup_bc_llm()
+
+    mock_tg_file = MagicMock()
+    mock_tg_file.download_as_bytearray = AsyncMock(return_value=bytearray(b"voice-data"))
+
+    mock_bot = MagicMock()
+    mock_bot.get_file = AsyncMock(return_value=mock_tg_file)
+
+    ctx = _mock_context(bot=mock_bot)
+
+    with (
+        patch("src.handler.voice_handler.VoiceHandler") as MockHandler,
+        patch("src.telegram.handlers.settings") as mock_settings,
+        patch("src.media.speech.text_to_speech") as mock_tts,
+    ):
+        mock_handler = MagicMock()
+        mock_handler._handle_internal = AsyncMock(return_value="Here's my advice.")
+        MockHandler.return_value = mock_handler
+
+        mock_settings.tts_enabled = True
+        mock_settings.max_attachment_size_bytes = 25 * 1024 * 1024
+        mock_tts.return_value = b"fake-tts-audio"
+
+        await handle_voice(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
+
+        # Text reply should be sent
+        mock_bc.send_message.assert_called_once_with(chat_guid="123456", message="Here's my advice.")
+        # Voice reply should be sent
+        mock_bc.send_voice.assert_called_once_with(b"fake-tts-audio", caption="🔊 Voice reply")
+        mock_tts.assert_called_once_with("Here's my advice.")
+
+
+@pytest.mark.asyncio
+async def test_handle_voice_skips_voice_reply_when_tts_disabled():
+    """Test that voice handler does NOT send voice reply when TTS is disabled."""
+    voice = MagicMock(spec=Voice)
+    voice.file_id = "voice_nott"
+    voice.file_size = 30000
+    voice.duration = 15
+    voice.mime_type = "audio/ogg"
+
+    msg = _mock_message(voice=voice)
+    update = _mock_update(msg)
+
+    mock_bc, mock_llm = _setup_bc_llm()
+
+    mock_tg_file = MagicMock()
+    mock_tg_file.download_as_bytearray = AsyncMock(return_value=bytearray(b"voice-data"))
+
+    mock_bot = MagicMock()
+    mock_bot.get_file = AsyncMock(return_value=mock_tg_file)
+
+    ctx = _mock_context(bot=mock_bot)
+
+    with (
+        patch("src.handler.voice_handler.VoiceHandler") as MockHandler,
+        patch("src.telegram.handlers.settings") as mock_settings,
+        patch("src.media.speech.text_to_speech") as mock_tts,
+    ):
+        mock_handler = MagicMock()
+        mock_handler._handle_internal = AsyncMock(return_value="Here's my advice.")
+        MockHandler.return_value = mock_handler
+
+        mock_settings.tts_enabled = False
+        mock_settings.max_attachment_size_bytes = 25 * 1024 * 1024
+
+        await handle_voice(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
+
+        # Text reply should still be sent
+        mock_bc.send_message.assert_called_once_with(chat_guid="123456", message="Here's my advice.")
+        # Voice reply should NOT be sent
+        mock_bc.send_voice.assert_not_called()
+        mock_tts.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_handle_voice_tts_failure_is_non_fatal():
+    """Test that TTS failure doesn't break the voice handler — text reply still sent."""
+    voice = MagicMock(spec=Voice)
+    voice.file_id = "voice_ttsfail"
+    voice.file_size = 30000
+    voice.duration = 15
+    voice.mime_type = "audio/ogg"
+
+    msg = _mock_message(voice=voice)
+    update = _mock_update(msg)
+
+    mock_bc, mock_llm = _setup_bc_llm()
+
+    mock_tg_file = MagicMock()
+    mock_tg_file.download_as_bytearray = AsyncMock(return_value=bytearray(b"voice-data"))
+
+    mock_bot = MagicMock()
+    mock_bot.get_file = AsyncMock(return_value=mock_tg_file)
+
+    ctx = _mock_context(bot=mock_bot)
+
+    with (
+        patch("src.handler.voice_handler.VoiceHandler") as MockHandler,
+        patch("src.telegram.handlers.settings") as mock_settings,
+        patch("src.media.speech.text_to_speech") as mock_tts,
+    ):
+        mock_handler = MagicMock()
+        mock_handler._handle_internal = AsyncMock(return_value="Some advice.")
+        MockHandler.return_value = mock_handler
+
+        mock_settings.tts_enabled = True
+        mock_settings.max_attachment_size_bytes = 25 * 1024 * 1024
+        mock_tts.side_effect = RuntimeError("TTS API down")
+
+        # Should NOT raise — TTS failure is non-fatal
+        await handle_voice(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
+
+        # Text reply should still be sent
+        mock_bc.send_message.assert_called_once_with(chat_guid="123456", message="Some advice.")
+        # Voice reply should NOT be sent (TTS failed)
+        mock_bc.send_voice.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_handle_voice_no_response_skips_reply():
+    """Test that empty response from VoiceHandler results in no reply."""
+    voice = MagicMock(spec=Voice)
+    voice.file_id = "voice_empty"
+    voice.file_size = 30000
+    voice.duration = 15
+    voice.mime_type = "audio/ogg"
+
+    msg = _mock_message(voice=voice)
+    update = _mock_update(msg)
+
+    mock_bc, mock_llm = _setup_bc_llm()
+
+    mock_tg_file = MagicMock()
+    mock_tg_file.download_as_bytearray = AsyncMock(return_value=bytearray(b"voice-data"))
+
+    mock_bot = MagicMock()
+    mock_bot.get_file = AsyncMock(return_value=mock_tg_file)
+
+    ctx = _mock_context(bot=mock_bot)
+
+    with (
+        patch("src.handler.voice_handler.VoiceHandler") as MockHandler,
+        patch("src.telegram.handlers.settings") as mock_settings,
+        patch("src.media.speech.text_to_speech") as mock_tts,
+    ):
+        mock_handler = MagicMock()
+        mock_handler._handle_internal = AsyncMock(return_value="")
+        MockHandler.return_value = mock_handler
+
+        mock_settings.tts_enabled = True
+        mock_settings.max_attachment_size_bytes = 25 * 1024 * 1024
+
+        await handle_voice(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
+
+        # Neither text nor voice should be sent for empty response
+        mock_bc.send_message.assert_not_called()
+        mock_bc.send_voice.assert_not_called()
+        mock_tts.assert_not_called()

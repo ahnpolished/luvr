@@ -27,8 +27,9 @@ class TelegramBridgeClient:
         self._attachment_cache: dict[str, bytes] = {}
         self._chat_id: int = 0
         self._message_reply: Any = None  # telegram.Message.reply_text
+        self._bot: Any = None  # telegram.Bot for send_voice
 
-    def configure(self, chat_id: int, reply_method: Any) -> None:
+    def configure(self, chat_id: int, reply_method: Any, bot: Any = None) -> None:
         """Configure the bridge client for the current update context.
 
         Called once per incoming message before dispatching to a handler.
@@ -36,9 +37,12 @@ class TelegramBridgeClient:
         Args:
             chat_id: Telegram chat identifier.
             reply_method: Callable for sending a reply (``message.reply_text``).
+            bot: Optional ``telegram.Bot`` instance for sending voice replies.
         """
         self._chat_id = chat_id
         self._message_reply = reply_method
+        if bot is not None:
+            self._bot = bot
 
     def cache_attachment(self, file_id: str, data: bytes) -> None:
         """Pre-load attachment bytes into the in-memory cache.
@@ -90,6 +94,40 @@ class TelegramBridgeClient:
             return sent
         except Exception:
             logger.exception("telegram_send_failed", chat_id=self._chat_id)
+            raise
+
+    async def send_voice(self, voice_bytes: bytes, caption: str | None = None) -> Any:
+        """Send a voice memo reply via Telegram.
+
+        Args:
+            voice_bytes: Raw opus/ogg audio bytes to send.
+            caption: Optional text caption to attach to the voice message.
+
+        Returns:
+            The sent ``telegram.Message`` object.
+
+        Raises:
+            RuntimeError: If the bridge client was not configured with a bot.
+        """
+        if self._bot is None:
+            logger.warning("bridge_not_configured_for_voice")
+            raise RuntimeError("TelegramBridgeClient not configured with bot for voice")
+
+        from io import BytesIO
+
+        voice_file = BytesIO(voice_bytes)
+        voice_file.name = "voice_reply.ogg"
+
+        try:
+            sent = await self._bot.send_voice(
+                chat_id=self._chat_id,
+                voice=voice_file,
+                caption=caption,
+            )
+            logger.debug("telegram_voice_sent", chat_id=self._chat_id)
+            return sent
+        except Exception:
+            logger.exception("telegram_send_voice_failed", chat_id=self._chat_id)
             raise
 
     async def aclose(self) -> None:

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; }
+  ::selection{ background:#0A0A0A; color:#FAFAFA; }
+  input::placeholder{ color:#B3ACA3; }
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="position:relative; min-width:100%; min-height:100vh; width:max-content; box-sizing:border-box; padding:64px; background:var(--page-tint,#FBF7F2); font-family:'Work Sans',-apple-system,sans-serif; overflow:hidden;">
+
+  <!-- AMBIENT GLOW -->
+  <div style="position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; opacity:var(--glow,1); transition:opacity .45s ease;">
+    <div style="position:absolute; top:-160px; left:6%; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle, var(--accent-soft,rgba(255,107,97,.16)), transparent 68%); filter:blur(18px);"></div>
+    <div style="position:absolute; top:34%; right:-140px; width:640px; height:640px; border-radius:50%; background:radial-gradient(circle, rgba(124,111,240,.12), transparent 68%); filter:blur(18px);"></div>
+    <div style="position:absolute; bottom:-200px; left:32%; width:620px; height:620px; border-radius:50%; background:radial-gradient(circle, var(--accent-tint,rgba(255,107,97,.08)), transparent 68%); filter:blur(18px);"></div>
+  </div>
+
+  <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:72px; align-items:flex-start;">
+
+  <!-- ============ ROW 1 : DESKTOP LANDING ============ -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="width:8px; height:8px; border-radius:50%; background:var(--accent,#FF6B61); display:inline-block;"></span>
+      <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:#8A837A;">Landing — Desktop</span>
+    </div>
+
+    <div data-screen-label="Landing" style="width:1200px; background:#FFFFFF; border:1px solid rgba(10,10,10,0.07); border-radius:var(--radius-lg,28px); overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.03), 0 30px 70px -28px rgba(40,24,16,.28);">
+
+      <!-- NAV -->
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:24px 44px; border-bottom:1px solid rgba(10,10,10,0.06);">
+        <div style="font-family:'Archivo Black',sans-serif; font-size:25px; letter-spacing:-0.02em; color:#0A0A0A;">Luvr<span style="color:var(--accent,#FF6B61);">.</span></div>
+        <div style="display:flex; align-items:center; gap:34px;">
+          <a href="#" style="font-size:14px; font-weight:600; color:#3A352F; text-decoration:none;">How it works</a>
+          <a href="#" style="font-size:14px; font-weight:600; color:#3A352F; text-decoration:none;">Privacy</a>
+          <a href="#" style="font-size:14px; font-weight:600; color:#3A352F; text-decoration:none;">Telegram</a>
+          <button style="background:var(--accent,#FF6B61); color:#fff; border:none; padding:11px 22px; border-radius:999px; font-family:'Work Sans'; font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px -8px color-mix(in srgb, var(--accent,#FF6B61) 65%, transparent);" style-hover="filter:brightness(0.95);">Start texting</button>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div style="display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; padding:80px 44px 72px;">
+        <div style="display:flex; flex-direction:column; align-items:flex-start;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:26px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:var(--accent,#FF6B61); display:inline-block;"></span>
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; color:#8A837A;">AI dating advice · over text</span>
+          </div>
+          <h1 style="font-family:'Archivo Black',sans-serif; font-size:60px; line-height:1.04; letter-spacing:-0.03em; color:#0A0A0A; margin:0 0 28px; max-width:11ch; text-wrap:balance;">Dating is confusing. Your advice shouldn't be.</h1>
+          <p style="font-size:20px; line-height:1.65; color:#5C564E; margin:0 0 38px; max-width:46ch;">Luvr is an AI you text like a friend. Send a question, a screenshot of a conversation going nowhere, or a voice memo about a date that went sideways — and get honest, real advice back.</p>
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:26px;">
+            <button style="background:var(--accent,#FF6B61); color:#fff; border:none; padding:16px 32px; border-radius:999px; font-family:'Work Sans'; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 12px 28px -10px color-mix(in srgb, var(--accent,#FF6B61) 70%, transparent);" style-hover="filter:brightness(0.95);">Start texting Luvr</button>
+            <button style="background:#fff; color:#0A0A0A; border:1px solid rgba(10,10,10,0.14); padding:16px 28px; border-radius:999px; font-family:'Work Sans'; font-size:16px; font-weight:700; cursor:pointer;" style-hover="background:#F6F3EE;">See how it works</button>
+          </div>
+          <div style="font-family:'Space Mono',monospace; font-size:12px; color:#A39C92; letter-spacing:0.02em;">No swiping. No profiles. No therapy-speak.</div>
+        </div>
+
+        <!-- HERO CHAT -->
+        <div style="background:linear-gradient(165deg,#FFFFFF, var(--accent-tint,rgba(255,107,97,.08))); border:1px solid rgba(10,10,10,0.06); border-radius:var(--radius-lg,28px); padding:28px; display:flex; flex-direction:column; gap:14px; box-shadow:0 1px 2px rgba(0,0,0,.03), 0 20px 50px -24px rgba(40,24,16,.22);">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span style="width:30px; height:30px; border-radius:50%; background:var(--accent,#FF6B61); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black',sans-serif; font-size:13px;">L</span>
+            <span style="font-weight:700; font-size:14px; color:#0A0A0A;">Luvr</span>
+            <span style="font-family:'Space Mono',monospace; font-size:11px; color:#A39C92;">now active</span>
+          </div>
+          <div style="align-self:flex-end; max-width:82%; background:#0A0A0A; color:#FAFAFA; padding:13px 16px; border-radius:20px 20px 6px 20px; font-size:15px; line-height:1.5;">he said "we should hang sometime" then went quiet for 4 days. do i text him??</div>
+          <div style="align-self:flex-start; max-width:88%; background:#fff; border:1px solid rgba(10,10,10,0.08); color:#0A0A0A; padding:13px 16px; border-radius:20px 20px 20px 6px; font-size:15px; line-height:1.55;">Four days of silence after a vague "sometime" is information, not an accident.</div>
+          <div style="align-self:flex-start; max-width:88%; background:#fff; border:1px solid rgba(10,10,10,0.08); color:#0A0A0A; padding:13px 16px; border-radius:20px 20px 20px 6px; font-size:15px; line-height:1.55;">Text once if you want — keep it light, no essay. If the same energy comes back, you've got your answer. You're not chasing, you're checking.</div>
+          <div style="align-self:flex-end; max-width:82%; background:#0A0A0A; color:#FAFAFA; padding:13px 16px; border-radius:20px 20px 6px 20px; font-size:15px; line-height:1.5;">ok that's fair. brutal but fair 😭</div>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div style="padding:24px 44px 64px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:36px;">
+          <span style="width:7px; height:7px; border-radius:50%; background:var(--accent,#FF6B61); display:inline-block;"></span>
+          <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; color:#8A837A;">However you want to say it</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+          <div style="background:#FBF8F3; border:1px solid rgba(10,10,10,0.05); border-radius:var(--radius,18px); padding:28px;">
+            <div style="font-family:'Archivo Black',sans-serif; font-size:34px; color:var(--accent,#FF6B61); letter-spacing:-0.02em; margin-bottom:14px;">01</div>
+            <h3 style="font-family:'Archivo Black',sans-serif; font-size:20px; color:#0A0A0A; margin:0 0 10px; letter-spacing:-0.01em;">Just text it</h3>
+            <p style="font-size:15px; line-height:1.65; color:#5C564E; margin:0;">Type out the question, the spiral, the whole situation. Luvr replies like a friend who's actually paying attention.</p>
+          </div>
+          <div style="background:#FBF8F3; border:1px solid rgba(10,10,10,0.05); border-radius:var(--radius,18px); padding:28px;">
+            <div style="font-family:'Archivo Black',sans-serif; font-size:34px; color:var(--accent,#FF6B61); letter-spacing:-0.02em; margin-bottom:14px;">02</div>
+            <h3 style="font-family:'Archivo Black',sans-serif; font-size:20px; color:#0A0A0A; margin:0 0 10px; letter-spacing:-0.01em;">Send the screenshot</h3>
+            <p style="font-size:15px; line-height:1.65; color:#5C564E; margin:0;">Drop in the confusing thread or the bio that's giving mixed signals. Luvr reads the room so you don't have to guess.</p>
+          </div>
+          <div style="background:#FBF8F3; border:1px solid rgba(10,10,10,0.05); border-radius:var(--radius,18px); padding:28px;">
+            <div style="font-family:'Archivo Black',sans-serif; font-size:34px; color:var(--accent,#FF6B61); letter-spacing:-0.02em; margin-bottom:14px;">03</div>
+            <h3 style="font-family:'Archivo Black',sans-serif; font-size:20px; color:#0A0A0A; margin:0 0 10px; letter-spacing:-0.01em;">Or just talk</h3>
+            <p style="font-size:15px; line-height:1.65; color:#5C564E; margin:0;">Some things are too long or too raw to type. Send a voice memo. Luvr listens and texts you back.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PULL QUOTE -->
+      <div style="padding:8px 44px 64px;">
+        <div style="background:linear-gradient(150deg,#FBF8F3, var(--accent-tint,rgba(255,107,97,.08))); border-radius:var(--radius-lg,28px); padding:48px 44px;">
+          <blockquote style="margin:0; border-left:4px solid var(--accent,#FF6B61); padding-left:28px; max-width:62ch;">
+            <p style="font-family:'Work Sans'; font-style:italic; font-size:28px; line-height:1.42; color:#0A0A0A; margin:0;">"Your group chat loves you, but they're rooting for the story. Luvr is rooting for you — even when the honest answer isn't the one you wanted."</p>
+          </blockquote>
+        </div>
+      </div>
+
+      <!-- CHANNELS -->
+      <div style="padding:8px 44px 64px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:32px;">
+          <span style="width:7px; height:7px; border-radius:50%; background:var(--accent,#FF6B61); display:inline-block;"></span>
+          <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; color:#8A837A;">Start where you already text</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div style="background:#fff; border:1px solid rgba(10,10,10,0.07); border-radius:var(--radius,18px); padding:30px; display:flex; flex-direction:column; gap:8px; box-shadow:0 14px 36px -22px rgba(40,24,16,.3);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <h3 style="font-family:'Archivo Black',sans-serif; font-size:22px; color:#0A0A0A; margin:0;">Telegram</h3>
+              <span style="font-size:11px; font-weight:700; color:#16A34A; background:#EAF7EE; padding:5px 12px; border-radius:999px;">Available now</span>
+            </div>
+            <p style="font-size:15px; line-height:1.6; color:#5C564E; margin:0 0 14px;">Add Luvr to Telegram and start texting in under a minute. No app to download.</p>
+            <button style="align-self:flex-start; background:#0A0A0A; color:#fff; border:none; padding:12px 24px; border-radius:999px; font-family:'Work Sans'; font-size:14px; font-weight:700; cursor:pointer;" style-hover="background:var(--accent,#FF6B61);">Open in Telegram</button>
+          </div>
+          <div style="background:#FBF8F3; border:1px solid rgba(10,10,10,0.05); border-radius:var(--radius,18px); padding:30px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <h3 style="font-family:'Archivo Black',sans-serif; font-size:22px; color:#B3ACA3; margin:0;">iMessage</h3>
+              <span style="font-size:11px; font-weight:700; color:#A39C92; background:#F0ECE5; padding:5px 12px; border-radius:999px;">Coming soon</span>
+            </div>
+            <p style="font-size:15px; line-height:1.6; color:#A39C92; margin:0 0 14px;">Texting Luvr from the blue bubbles you already live in. Almost here.</p>
+            <button disabled style="align-self:flex-start; background:transparent; color:#A39C92; border:1px solid rgba(10,10,10,0.12); padding:12px 24px; border-radius:999px; font-family:'Work Sans'; font-size:14px; font-weight:700; cursor:not-allowed; opacity:0.7;">Notify me</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA BAND -->
+      <div style="margin:0 44px 64px; background:linear-gradient(135deg,#211A17,#0A0A0A); border-radius:var(--radius-lg,28px); padding:60px 48px; display:flex; align-items:center; justify-content:space-between; gap:40px;">
+        <h2 style="font-family:'Archivo Black',sans-serif; font-size:44px; line-height:1.02; letter-spacing:-0.03em; color:#FAFAFA; margin:0; max-width:16ch;">Stop asking the group chat.</h2>
+        <button style="flex-shrink:0; background:var(--accent,#FF6B61); color:#fff; border:none; padding:17px 36px; border-radius:999px; font-family:'Work Sans'; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 14px 32px -10px color-mix(in srgb, var(--accent,#FF6B61) 75%, transparent);" style-hover="filter:brightness(0.95);">Start texting Luvr</button>
+      </div>
+
+      <!-- FOOTER -->
+      <div style="border-top:1px solid rgba(10,10,10,0.06); padding:40px 44px; display:flex; align-items:flex-start; justify-content:space-between; gap:40px;">
+        <div style="max-width:38ch;">
+          <div style="font-family:'Archivo Black',sans-serif; font-size:21px; color:#0A0A0A; margin-bottom:12px;">Luvr<span style="color:var(--accent,#FF6B61);">.</span></div>
+          <p style="font-family:'Space Mono',monospace; font-size:12px; line-height:1.7; color:#A39C92; margin:0;">If you're in crisis, Luvr will point you toward real resources — but it's not a substitute for them. Talk to a person you trust.</p>
+        </div>
+        <div style="display:flex; gap:64px;">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#0A0A0A;">Product</span>
+            <a href="#" style="font-size:13px; color:#5C564E; text-decoration:none;">How it works</a>
+            <a href="#" style="font-size:13px; color:#5C564E; text-decoration:none;">Telegram</a>
+            <a href="#" style="font-size:13px; color:#5C564E; text-decoration:none;">iMessage</a>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#0A0A0A;">Company</span>
+            <a href="#" style="font-size:13px; color:#5C564E; text-decoration:none;">Privacy &amp; data</a>
+            <a href="#" style="font-size:13px; color:#5C564E; text-decoration:none;">Terms</a>
+            <a href="#" style="font-size:13px; color:#5C564E; text-decoration:none;">Contact</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ ROW 2 : MOBILE FLOW ============ -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="width:8px; height:8px; border-radius:50%; background:var(--accent,#FF6B61); display:inline-block;"></span>
+      <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:#8A837A;">Onboarding &amp; Account — Mobile</span>
+    </div>
+
+    <div style="display:flex; gap:44px; align-items:flex-start;">
+
+      <!-- AUTH -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#9A938A;">1 · Sign in</span>
+        <div data-screen-label="Auth" style="width:390px; min-height:800px; background:#FFFFFF; border:1px solid rgba(10,10,10,0.07); border-radius:var(--radius-lg,28px); overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.03), 0 30px 70px -28px rgba(40,24,16,.28); display:flex; flex-direction:column;">
+          <div style="padding:22px 26px; border-bottom:1px solid rgba(10,10,10,0.06);">
+            <span style="font-family:'Archivo Black',sans-serif; font-size:20px; color:#0A0A0A;">Luvr<span style="color:var(--accent,#FF6B61);">.</span></span>
+          </div>
+          <div style="padding:38px 28px; display:flex; flex-direction:column; flex:1;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:#8A837A; margin-bottom:14px;">Welcome</span>
+            <h2 style="font-family:'Archivo Black',sans-serif; font-size:30px; line-height:1.06; letter-spacing:-0.02em; color:#0A0A0A; margin:0 0 14px;">Let's get you set up.</h2>
+            <p style="font-size:15px; line-height:1.6; color:#5C564E; margin:0 0 32px;">Enter your number — we'll text you a code. No passwords, ever.</p>
+
+            <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0A0A0A; margin-bottom:8px;">Phone number</label>
+            <div style="display:flex; gap:10px; margin-bottom:8px;">
+              <div style="width:64px; height:50px; border:1px solid rgba(10,10,10,0.14); border-radius:var(--radius,18px); background:#FBF8F3; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; color:#0A0A0A;">+1</div>
+              <input type="text" placeholder="(555) 012 3456" style="flex:1; height:50px; border:1px solid rgba(10,10,10,0.14); border-radius:var(--radius,18px); background:#fff; padding:8px 16px; font-family:'Work Sans'; font-size:15px; color:#0A0A0A; outline:none;" style-focus="border-color:var(--accent,#FF6B61); box-shadow:0 0 0 4px var(--accent-tint,rgba(255,107,97,.08));">
+            </div>
+            <p style="font-size:12px; line-height:1.5; color:#8A837A; margin:0 0 30px;">Standard message rates may apply.</p>
+
+            <button style="height:52px; background:var(--accent,#FF6B61); color:#fff; border:none; border-radius:999px; font-family:'Work Sans'; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 12px 26px -10px color-mix(in srgb, var(--accent,#FF6B61) 70%, transparent);" style-hover="filter:brightness(0.95);">Send code</button>
+
+            <div style="display:flex; align-items:center; gap:14px; margin:24px 0;">
+              <span style="flex:1; height:1px; background:rgba(10,10,10,0.1);"></span>
+              <span style="font-family:'Space Mono',monospace; font-size:11px; color:#A39C92; text-transform:uppercase;">or</span>
+              <span style="flex:1; height:1px; background:rgba(10,10,10,0.1);"></span>
+            </div>
+            <button style="height:52px; background:#fff; color:#0A0A0A; border:1px solid rgba(10,10,10,0.14); border-radius:999px; font-family:'Work Sans'; font-size:15px; font-weight:700; cursor:pointer;" style-hover="background:#F6F3EE;">Use email instead</button>
+
+            <p style="font-family:'Space Mono',monospace; font-size:11px; line-height:1.6; color:#A39C92; margin:auto 0 0; padding-top:28px;">By continuing you agree to the Terms and Privacy Policy.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSTAGRAM CONTEXT -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#9A938A;">2 · Context (not login)</span>
+        <div data-screen-label="Instagram context" style="width:390px; min-height:800px; background:#FFFFFF; border:1px solid rgba(10,10,10,0.07); border-radius:var(--radius-lg,28px); overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.03), 0 30px 70px -28px rgba(40,24,16,.28); display:flex; flex-direction:column;">
+          <div style="padding:22px 26px; border-bottom:1px solid rgba(10,10,10,0.06); display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-family:'Archivo Black',sans-serif; font-size:20px; color:#0A0A0A;">Luvr<span style="color:var(--accent,#FF6B61);">.</span></span>
+            <span style="font-family:'Space Mono',monospace; font-size:11px; color:#8A837A; letter-spacing:0.04em;">STEP 2 / 3</span>
+          </div>
+          <div style="display:flex; gap:6px; padding:18px 26px 0;">
+            <span style="flex:1; height:5px; border-radius:999px; background:var(--accent,#FF6B61);"></span>
+            <span style="flex:1; height:5px; border-radius:999px; background:var(--accent,#FF6B61);"></span>
+            <span style="flex:1; height:5px; border-radius:999px; background:rgba(10,10,10,0.1);"></span>
+          </div>
+          <div style="padding:28px 28px 36px; display:flex; flex-direction:column; flex:1;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:#8A837A; margin-bottom:14px;">Context</span>
+            <h2 style="font-family:'Archivo Black',sans-serif; font-size:30px; line-height:1.06; letter-spacing:-0.02em; color:#0A0A0A; margin:0 0 14px;">Give Luvr some context.</h2>
+            <p style="font-size:15px; line-height:1.6; color:#5C564E; margin:0 0 28px;">Drop your public Instagram handle. Luvr reads your bio and the vibe of your page so its advice actually fits you.</p>
+
+            <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0A0A0A; margin-bottom:8px;">Instagram handle</label>
+            <div style="display:flex; align-items:center; height:50px; border:1px solid rgba(10,10,10,0.14); border-radius:var(--radius,18px); background:#fff; margin-bottom:8px; overflow:hidden;" style-focus-within="border-color:var(--accent,#FF6B61);">
+              <span style="width:46px; text-align:center; font-size:17px; font-weight:700; color:#0A0A0A;">@</span>
+              <input type="text" placeholder="yourhandle" style="flex:1; height:100%; border:none; background:transparent; padding:0 14px 0 4px; font-family:'Work Sans'; font-size:15px; color:#0A0A0A; outline:none;">
+            </div>
+            <p style="font-size:12px; line-height:1.55; color:#8A837A; margin:0 0 18px;">Public profiles only. We read your bio and themes — never your DMs, never anything private.</p>
+
+            <div style="background:var(--accent-tint,rgba(255,107,97,.07)); border-radius:var(--radius,18px); padding:16px 18px; margin-bottom:auto; display:flex; gap:12px; align-items:flex-start;">
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--accent,#FF6B61); margin-top:6px; flex-shrink:0;"></span>
+              <p style="font-family:'Space Mono',monospace; font-size:12px; line-height:1.65; color:#3A352F; margin:0;">Luvr keeps a short, readable summary of your vibe — not a copy of your account. You can see and edit it anytime.</p>
+            </div>
+
+            <button style="height:52px; background:var(--accent,#FF6B61); color:#fff; border:none; border-radius:999px; font-family:'Work Sans'; font-size:15px; font-weight:700; cursor:pointer; margin-top:28px; box-shadow:0 12px 26px -10px color-mix(in srgb, var(--accent,#FF6B61) 70%, transparent);" style-hover="filter:brightness(0.95);">Continue</button>
+            <button style="background:transparent; border:none; color:#5C564E; font-family:'Work Sans'; font-size:14px; font-weight:700; cursor:pointer; padding:16px 0 0;" style-hover="color:var(--accent,#FF6B61);">I'd rather describe myself</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#9A938A;">3 · Account</span>
+        <div data-screen-label="Profile" style="width:390px; min-height:800px; background:#FFFFFF; border:1px solid rgba(10,10,10,0.07); border-radius:var(--radius-lg,28px); overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.03), 0 30px 70px -28px rgba(40,24,16,.28); display:flex; flex-direction:column;">
+          <div style="padding:22px 26px; border-bottom:1px solid rgba(10,10,10,0.06); display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-family:'Archivo Black',sans-serif; font-size:20px; color:#0A0A0A;">Luvr<span style="color:var(--accent,#FF6B61);">.</span></span>
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#8A837A;">Account</span>
+          </div>
+
+          <div style="padding:28px 28px 24px; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(10,10,10,0.06);">
+            <div style="width:60px; height:60px; border-radius:9999px; background:linear-gradient(140deg, var(--accent,#FF6B61), #0A0A0A); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black',sans-serif; font-size:24px; flex-shrink:0;">M</div>
+            <div>
+              <div style="font-family:'Archivo Black',sans-serif; font-size:22px; color:#0A0A0A; letter-spacing:-0.01em;">Maya</div>
+              <div style="font-family:'Space Mono',monospace; font-size:12px; color:#8A837A; margin-top:2px;">@maya · linked to Telegram</div>
+            </div>
+          </div>
+
+          <div style="padding:26px 28px; display:flex; flex-direction:column; gap:26px; flex:1;">
+
+            <div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#0A0A0A;">What Luvr knows</span>
+                <button style="background:transparent; border:none; font-size:12px; font-weight:700; color:var(--accent,#FF6B61); cursor:pointer; padding:0;">Edit</button>
+              </div>
+              <div style="background:var(--accent-tint,rgba(255,107,97,.07)); border:1px solid rgba(10,10,10,0.05); border-radius:var(--radius,18px); padding:18px;">
+                <p style="font-size:14px; line-height:1.6; color:#0A0A0A; margin:0 0 10px;">Mid-20s, Brooklyn. Into bouldering, film photography, and nights out dancing. Warm but a little guarded. Recently out of a long relationship and easing back in.</p>
+                <span style="font-family:'Space Mono',monospace; font-size:11px; color:#A39C92;">Pulled from @maya · editable anytime</span>
+              </div>
+            </div>
+
+            <div>
+              <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#0A0A0A; margin-bottom:4px;">Connections</span>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid rgba(10,10,10,0.06);">
+                <span style="font-size:15px; color:#0A0A0A;">Telegram</span>
+                <span style="font-size:11px; font-weight:700; color:#16A34A; background:#EAF7EE; padding:4px 11px; border-radius:999px;">Connected</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid rgba(10,10,10,0.06);">
+                <span style="font-size:15px; color:#0A0A0A;">Instagram</span>
+                <span style="font-family:'Space Mono',monospace; font-size:13px; color:#5C564E;">@maya</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0;">
+                <span style="font-size:15px; color:#A39C92;">iMessage</span>
+                <span style="font-size:11px; font-weight:700; color:#A39C92; background:#F0ECE5; padding:4px 11px; border-radius:999px;">Soon</span>
+              </div>
+            </div>
+
+            <div>
+              <span style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#0A0A0A; margin-bottom:12px;">This month</span>
+              <div style="display:flex; gap:12px;">
+                <div style="flex:1; background:#FBF8F3; border:1px solid rgba(10,10,10,0.05); border-radius:var(--radius,18px); padding:16px;">
+                  <div style="font-family:'Archivo Black',sans-serif; font-size:28px; color:#0A0A0A; line-height:1;">12</div>
+                  <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#8A837A; margin-top:6px;">Voice memos</div>
+                </div>
+                <div style="flex:1; background:#FBF8F3; border:1px solid rgba(10,10,10,0.05); border-radius:var(--radius,18px); padding:16px;">
+                  <div style="font-family:'Archivo Black',sans-serif; font-size:28px; color:#0A0A0A; line-height:1;">3</div>
+                  <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#8A837A; margin-top:6px;">Tarot pulls</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:auto;">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-top:1px solid rgba(10,10,10,0.06); font-size:15px; color:#0A0A0A; cursor:pointer;">Notifications <span style="color:#A39C92;">→</span></div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-top:1px solid rgba(10,10,10,0.06); font-size:15px; color:#0A0A0A; cursor:pointer;">Privacy &amp; data <span style="color:#A39C92;">→</span></div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-top:1px solid rgba(10,10,10,0.06); font-size:15px; color:var(--accent,#FF6B61); cursor:pointer;">Delete my data <span style="color:var(--accent,#FF6B61);">→</span></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1460,&quot;height&quot;:1120},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#FF6B61&quot;,&quot;options&quot;:[&quot;#FF6B61&quot;,&quot;#EF4444&quot;,&quot;#7C6FF0&quot;,&quot;#E8638C&quot;,&quot;#3FA796&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;cornerRadius&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:18,&quot;min&quot;:0,&quot;max&quot;:30,&quot;step&quot;:2,&quot;tsType&quot;:&quot;number&quot;},&quot;ambientGlow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;pageTint&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#FBF7F2&quot;,&quot;options&quot;:[&quot;#FBF7F2&quot;,&quot;#FAFAFA&quot;,&quot;#FBF3F1&quot;,&quot;#F4F6FB&quot;,&quot;#F3F7F4&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  applyVars(el) {
+    if (!el) return;
+    const p = this.props || {};
+    const accent = p.accentColor ?? '#FF6B61';
+    const r = (p.cornerRadius ?? 18);
+    const glow = (p.ambientGlow ?? true) ? '1' : '0';
+    const tint = p.pageTint ?? '#FBF7F2';
+    el.style.setProperty('--accent', accent);
+    el.style.setProperty('--accent-soft', `color-mix(in srgb, ${accent} 16%, transparent)`);
+    el.style.setProperty('--accent-tint', `color-mix(in srgb, ${accent} 8%, transparent)`);
+    el.style.setProperty('--radius', r + 'px');
+    el.style.setProperty('--radius-lg', (r + 10) + 'px');
+    el.style.setProperty('--glow', glow);
+    el.style.setProperty('--page-tint', tint);
+  }
+  componentDidMount() { this.applyVars(this._root); }
+  componentDidUpdate() { this.applyVars(this._root); }
+  renderVals() {
+    return {
+      setRoot: (el) => { this._root = el; this.applyVars(el); }
+    };
+  }
+}
+</script>
+</body>
+</html>

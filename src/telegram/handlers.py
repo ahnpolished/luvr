@@ -73,7 +73,7 @@ async def handle_text(
     )
 
     # --- Configure bridge client for this update ---
-    bc.configure(chat_id=chat_id, reply_method=update.message.reply_text)
+    bc.configure(chat_id=chat_id, reply_method=update.message.reply_text, bot=context.bot)
 
     # --- Dispatch to existing TextHandler ---
     from src.handler.text_handler import TextHandler
@@ -141,7 +141,7 @@ async def handle_photo(
 
     # --- Cache in bridge client ---
     bc.cache_attachment(photo.file_id, photo_bytes)
-    bc.configure(chat_id=chat_id, reply_method=update.message.reply_text)
+    bc.configure(chat_id=chat_id, reply_method=update.message.reply_text, bot=context.bot)
 
     # --- Build internal message ---
     caption = update.message.caption or ""
@@ -223,7 +223,7 @@ async def handle_voice(
 
     # --- Cache in bridge client ---
     bc.cache_attachment(voice.file_id, voice_bytes)
-    bc.configure(chat_id=chat_id, reply_method=update.message.reply_text)
+    bc.configure(chat_id=chat_id, reply_method=update.message.reply_text, bot=context.bot)
 
     # --- Build internal message ---
     attachment = TelegramAttachment(
@@ -245,8 +245,23 @@ async def handle_voice(
     handler = VoiceHandler(bridge_client=bc, llm_client=lc)
     try:
         response = await handler._handle_internal(msg)
-        if response:
-            await bc.send_message(chat_guid=str(chat_id), message=response)
+        if not response:
+            return
+
+        # Always send the text response first (so the user can read if they can't listen)
+        await bc.send_message(chat_guid=str(chat_id), message=response)
+
+        # Send a voice reply if TTS is enabled
+        if settings.tts_enabled:
+            try:
+                from src.media.speech import text_to_speech
+
+                voice_bytes = text_to_speech(response)
+                # Use a short caption so the user knows it's the voice reply
+                await bc.send_voice(voice_bytes, caption="🔊 Voice reply")
+            except Exception:
+                logger.exception("tts_voice_reply_failed")
+                # Non-fatal: the text reply was already sent
     except Exception:
         logger.exception("voice_handler_error")
         await update.message.reply_text("I had trouble processing that voice memo. Could you try again or type it? 🎤")

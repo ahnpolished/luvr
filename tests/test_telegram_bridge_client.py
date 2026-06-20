@@ -9,6 +9,81 @@ import pytest
 from src.telegram.bridge_client import TelegramBridgeClient
 
 
+@pytest.mark.asyncio
+async def test_send_voice_not_configured():
+    """Test send_voice raises RuntimeError when bot is not configured."""
+    client = TelegramBridgeClient()
+    with pytest.raises(RuntimeError, match="not configured with bot"):
+        await client.send_voice(b"fake-audio")
+
+
+@pytest.mark.asyncio
+async def test_send_voice():
+    """Test sending a voice memo through the bridge client."""
+    from unittest.mock import AsyncMock
+
+    client = TelegramBridgeClient()
+    mock_bot = AsyncMock()
+    mock_reply = AsyncMock()
+    client.configure(chat_id=123456, reply_method=mock_reply, bot=mock_bot)
+
+    await client.send_voice(b"fake-opus-audio", caption="Voice reply")
+
+    mock_bot.send_voice.assert_called_once()
+    call_kwargs = mock_bot.send_voice.call_args[1]
+    assert call_kwargs["chat_id"] == 123456
+    assert call_kwargs["caption"] == "Voice reply"
+
+
+@pytest.mark.asyncio
+async def test_send_voice_error_handling():
+    """Test that send_voice propagates errors."""
+    from unittest.mock import AsyncMock
+
+    client = TelegramBridgeClient()
+    mock_bot = AsyncMock()
+    mock_bot.send_voice.side_effect = Exception("Telegram API error")
+    mock_reply = AsyncMock()
+    client.configure(chat_id=123456, reply_method=mock_reply, bot=mock_bot)
+
+    with pytest.raises(Exception, match="Telegram API error"):
+        await client.send_voice(b"fake-audio")
+
+
+@pytest.mark.asyncio
+async def test_configure_preserves_existing_bot_when_bot_is_none():
+    """Test that configure with bot=None keeps previously set bot."""
+    from unittest.mock import AsyncMock
+
+    client = TelegramBridgeClient()
+    mock_bot = AsyncMock()
+    mock_reply = AsyncMock()
+
+    # First configure with a bot
+    client.configure(chat_id=1, reply_method=mock_reply, bot=mock_bot)
+    assert client._bot is mock_bot
+
+    # Re-configure without bot — should keep previous bot
+    client.configure(chat_id=2, reply_method=mock_reply)
+    assert client._bot is mock_bot  # preserved
+
+
+@pytest.mark.asyncio
+async def test_send_voice_without_caption():
+    """Test sending voice without a caption."""
+    from unittest.mock import AsyncMock
+
+    client = TelegramBridgeClient()
+    mock_bot = AsyncMock()
+    mock_reply = AsyncMock()
+    client.configure(chat_id=123456, reply_method=mock_reply, bot=mock_bot)
+
+    await client.send_voice(b"fake-opus-audio")
+
+    call_kwargs = mock_bot.send_voice.call_args[1]
+    assert call_kwargs["caption"] is None
+
+
 def test_bridge_client_initialization():
     """Test that bridge client initializes with empty state."""
     client = TelegramBridgeClient()

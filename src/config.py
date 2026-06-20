@@ -65,6 +65,14 @@ class Settings(BaseSettings):
     max_attachment_size_mb: int = 25
     whisper_model: str = "whisper-1"
 
+    # --- TTS (Text-to-Speech) ---
+    # Whether to reply with a voice memo when the user sends one
+    tts_enabled: bool = True
+    # OpenAI TTS model: "tts-1" (faster) or "tts-1-hd" (higher quality)
+    tts_model: str = "tts-1"
+    # Voice persona: alloy, echo, fable, onyx, nova, shimmer
+    tts_voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"] = "nova"
+
     # --- Rate Limiting ---
     max_messages_per_minute: int = 10
     max_messages_per_hour: int = 50
