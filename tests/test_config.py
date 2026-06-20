@@ -98,3 +98,16 @@ def test_temp_dir_creation():
     temp_dir = settings.temp_dir
     assert temp_dir.exists()
     assert temp_dir.name == "tmp"
+
+
+def test_eval_trace_policy_uses_configured_retention():
+    """Test eval trace policy config."""
+    from src.config import Settings
+
+    settings = Settings(
+        telegram_bot_token="test-token",
+        bluebubbles_server_url="http://test:1234",
+        eval_trace_retention_days=21,
+    )
+
+    assert settings.eval_trace_policy().retention_days == 21

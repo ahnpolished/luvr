@@ -14,6 +14,8 @@ from typing import Any, Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from src.eval_trace_policy import EvalTracePolicy
+
 
 class Settings(BaseSettings):
     """Luvr application settings loaded from environment variables."""
@@ -63,6 +65,7 @@ class Settings(BaseSettings):
 
     # --- Media ---
     max_attachment_size_mb: int = 25
+    eval_trace_retention_days: int = 14
     whisper_model: str = "whisper-1"
 
     # --- TTS (Text-to-Speech) ---
@@ -96,6 +99,9 @@ class Settings(BaseSettings):
     def max_attachment_size_bytes(self) -> int:
         """Max attachment size in bytes."""
         return self.max_attachment_size_mb * 1024 * 1024
+
+    def eval_trace_policy(self) -> EvalTracePolicy:
+        return EvalTracePolicy(retention_days=self.eval_trace_retention_days)
 
 
 def _running_under_pytest() -> bool:
