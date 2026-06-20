@@ -22,9 +22,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_vercel_api_token: ${{ secrets.VERCEL_API_TOKEN }}
-      TF_VAR_railway_api_token: ${{ secrets.RAILWAY_API_TOKEN }}
       VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
-      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -47,11 +45,7 @@ jobs:
             -backend-config="skip_metadata_api_check=true"
 
       - name: Terraform Apply (Staging)
-        run: |
-          terraform apply -auto-approve \
-            -var="shared_env_vars=${{ toJSON(secrets.STAGING_SHARED_ENV_VARS) }}" \
-            -var="api_env_vars=${{ toJSON(secrets.STAGING_API_ENV_VARS) }}" \
-            -var="telegram_env_vars=${{ toJSON(secrets.STAGING_TELEGRAM_ENV_VARS) }}"
+        run: terraform apply -auto-approve
 
   production:
     name: Apply Production
@@ -69,9 +63,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_vercel_api_token: ${{ secrets.VERCEL_API_TOKEN }}
-      TF_VAR_railway_api_token: ${{ secrets.RAILWAY_API_TOKEN }}
       VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
-      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -94,8 +86,4 @@ jobs:
             -backend-config="skip_metadata_api_check=true"
 
       - name: Terraform Apply (Production)
-        run: |
-          terraform apply -auto-approve \
-            -var="shared_env_vars=${{ toJSON(secrets.PROD_SHARED_ENV_VARS) }}" \
-            -var="api_env_vars=${{ toJSON(secrets.PROD_API_ENV_VARS) }}" \
-            -var="telegram_env_vars=${{ toJSON(secrets.PROD_TELEGRAM_ENV_VARS) }}"
+        run: terraform apply -auto-approve

@@ -1,5 +1,8 @@
 # --------------------------------------------------------------------
 # Luvr Production Environment
+#
+# Terraform manages Cloudflare DNS and Vercel.
+# Railway is managed outside Terraform — see docs/deploy/DEPLOY.md.
 # --------------------------------------------------------------------
 
 terraform {
@@ -13,10 +16,6 @@ terraform {
     vercel = {
       source  = "vercel/vercel"
       version = "~> 1.0"
-    }
-    railway = {
-      source  = "railwayapp/railway"
-      version = ">= 0.2.0"
     }
   }
 }
@@ -33,10 +32,6 @@ provider "vercel" {
   api_token = var.vercel_api_token
 }
 
-provider "railway" {
-  api_token = var.railway_api_token
-}
-
 # --------------------------------------------------------------------
 # Variables
 # --------------------------------------------------------------------
@@ -49,12 +44,6 @@ variable "cloudflare_api_token" {
 
 variable "vercel_api_token" {
   description = "Vercel API token"
-  type        = string
-  sensitive   = true
-}
-
-variable "railway_api_token" {
-  description = "Railway API token"
   type        = string
   sensitive   = true
 }
@@ -79,42 +68,13 @@ variable "github_repo" {
   type        = string
 }
 
-variable "railway_project_name" {
-  description = "Railway project name"
-  type        = string
-}
-
 variable "vercel_project_name" {
   description = "Vercel project name"
   type        = string
 }
 
-variable "api_env_vars" {
-  description = "API service env vars"
-  type        = map(string)
-  sensitive   = true
-  default     = {}
-}
-
-variable "telegram_env_vars" {
-  description = "Telegram worker env vars"
-  type        = map(string)
-  sensitive   = true
-  default     = {}
-}
-
-variable "shared_env_vars" {
-  description = "Shared env vars"
-  type        = map(string)
-  sensitive   = true
-  default     = {}
-}
-
-# Placeholder CNAME target for the first apply.
-# After Railway provisions the API service, grab the real CNAME target
-# and update this value before the second apply.
 variable "railway_cname_target" {
-  description = "Railway CNAME target for the API domain (placeholder on first apply)"
+  description = "Railway CNAME target for the API domain"
   type        = string
   default     = "placeholder.railway.app"
 }
@@ -134,35 +94,6 @@ module "cloudflare" {
   ssl_mode                 = "full"
   enable_rate_limit        = true
   waf_rate_limit_threshold = 20 # stricter for production
-}
-
-# --------------------------------------------------------------------
-# Railway (API + telegram-worker)
-# --------------------------------------------------------------------
-
-module "railway" {
-  source = "../../modules/railway-service"
-
-  project_name     = var.railway_project_name
-  environment_name = "production"
-  api_domain       = var.api_domain
-
-  api_service_source = {
-    repo   = var.github_repo
-    branch = "main"
-  }
-  telegram_service_source = {
-    repo   = var.github_repo
-    branch = "main"
-  }
-
-  api_start_command            = null
-  telegram_start_command       = null
-  telegram_healthcheck_enabled = false
-
-  shared_env_vars   = var.shared_env_vars
-  api_env_vars      = var.api_env_vars
-  telegram_env_vars = var.telegram_env_vars
 }
 
 # --------------------------------------------------------------------
