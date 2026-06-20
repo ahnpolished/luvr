@@ -1,4 +1,5 @@
 import sys
+from contextlib import contextmanager
 from types import SimpleNamespace
 from typing import Any
 
@@ -40,8 +41,14 @@ def test_weave_runner_initializes_project_and_evaluates(monkeypatch: pytest.Monk
             calls["predict"] = predict
             return {"ok": True}
 
+    @contextmanager
+    def fake_attributes(labels: dict[str, Any]):
+        calls["labels"] = labels
+        yield
+
     fake_weave = SimpleNamespace(
         init=lambda project: calls.setdefault("project", project),
+        attributes=fake_attributes,
         Evaluation=FakeEvaluation,
     )
     monkeypatch.setitem(sys.modules, "weave", fake_weave)
@@ -49,11 +56,17 @@ def test_weave_runner_initializes_project_and_evaluates(monkeypatch: pytest.Monk
     result = run_weave_conversation_eval(
         predict=lambda row: {"response": row["user_input"]},
         project="humphreyahn/luvr",
+        span_labels={
+            "alpha_user_id": "alpha_123",
+            "display_name": "Tae",
+            "nickname": None,
+        },
     )
 
     assert result == {"ok": True}
     assert calls["project"] == "humphreyahn/luvr"
     assert calls["name"] == DEFAULT_CONVERSATION_EVAL_NAME
+    assert calls["labels"] == {"alpha_user_id": "alpha_123", "display_name": "Tae"}
     assert len(calls["dataset"]) == 3
     assert calls["dataset"][0]["tags"] == ["tone", "friend-like"]
     assert callable(calls["predict"])

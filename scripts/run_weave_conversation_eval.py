@@ -25,6 +25,16 @@ def load_predictor(path: str) -> Callable[[dict[str, Any]], Any]:
     return predictor
 
 
+def parse_span_labels(values: list[str]) -> dict[str, str]:
+    labels: dict[str, str] = {}
+    for value in values:
+        key, separator, label_value = value.partition("=")
+        if not separator or not key:
+            raise ValueError("Span labels must use key=value format")
+        labels[key] = label_value
+    return labels
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -38,6 +48,12 @@ def parse_args() -> argparse.Namespace:
         required=True,
         help="Callable to evaluate in module:function format.",
     )
+    parser.add_argument(
+        "--span-label",
+        action="append",
+        default=[],
+        help="Span label in key=value format. Repeat to add multiple labels.",
+    )
     return parser.parse_args()
 
 
@@ -50,6 +66,7 @@ def main() -> None:
         predict=load_predictor(args.predictor),
         project=args.project,
         eval_name=args.eval_name,
+        span_labels=parse_span_labels(args.span_label),
     )
 
 
