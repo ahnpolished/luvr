@@ -9,6 +9,8 @@ import structlog
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from src.alpha.registry import AlphaUserRegistry
+from src.alpha_auth import _get_alpha_code, create_alpha_token, decode_alpha_token
 from src.bridge.client import BlueBubblesClient
 from src.config import settings
 from src.handler.pipeline import MessagePipeline
@@ -56,6 +58,9 @@ async def health_check() -> dict[str, str]:
     return {"status": "ok", "service": "luvr", "version": "0.1.0"}
 
 
+alpha_registry = AlphaUserRegistry()
+
+
 @app.post("/webhook")
 async def webhook(request: Request) -> JSONResponse:
     """Receive incoming iMessage webhook from BlueBubbles.
@@ -75,3 +80,66 @@ async def webhook(request: Request) -> JSONResponse:
     except Exception:
         logger.exception("webhook_error")
         return JSONResponse({"status": "error", "message": "Internal processing error"}, status_code=500)
+
+
+# ------------------------------------------------------------------
+# Alpha web auth endpoints
+# ------------------------------------------------------------------
+
+
+@app.post("/auth/alpha/exchange")
+async def auth_alpha_exchange(request: Request) -> JSONResponse:
+    """Exchange an alpha invite code for a signed session token and profile."""
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"detail": "invalid json"}, status_code=400)
+
+    code = body.get("alpha_code", "")
+    alpha_code = _get_alpha_code()
+    if not alpha_code or code != alpha_code:
+        return JSONResponse({"detail": "invalid alpha code"}, status_code=401)
+
+    telegram_user_id = body.get("telegram_user_id")
+    profile = alpha_registry.get_or_create_for_telegram(
+        telegram_user_id=int(telegram_user_id) if telegram_user_id else 0,
+        telegram_chat_id=body.get("telegram_chat_id", 0),
+        telegram_username=body.get("telegram_username"),
+        display_name=body.get("display_name"),
+    )
+    alpha_registry.update_profile(profile.user_id, auth_completed=True)
+
+    session_token = create_alpha_token(user_id=profile.user_id, telegram_user_id=profile.telegram_user_id)
+
+    return JSONResponse(
+        {
+            "user_id": profile.user_id,
+            "telegram_user_id": profile.telegram_user_id,
+            "telegram_username": profile.telegram_username,
+            "display_name": profile.display_name,
+            "auth_completed": profile.auth_completed,
+            "session_token": session_token,
+        }
+    )
+
+
+@app.get("/auth/alpha/profile")
+async def auth_alpha_profile(request: Request) -> JSONResponse:
+    """Return the linked alpha profile for a valid session token."""
+    auth_header = request.headers.get("Authorization", "")
+    token = auth_header.removeprefix("Bearer ").strip()
+    if not token:
+        return JSONResponse({"detail": "missing authorization token"}, status_code=403)
+
+    try:
+        payload = decode_alpha_token(token)
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=403)
+
+    user_id = payload.get("user_id", "")
+    try:
+        profile = alpha_registry.get_profile(user_id)
+    except KeyError:
+        return JSONResponse({"detail": "unknown user"}, status_code=404)
+
+    return JSONResponse(profile.model_dump(mode="json"))
