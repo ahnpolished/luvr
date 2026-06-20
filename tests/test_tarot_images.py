@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from src.tarot.images import CARD_BACK_SLUG, CARD_SLUGS, card_back_path, card_image_path, random_cards
