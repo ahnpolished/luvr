@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from src.llm.language_detection import detect_language
+
 DATING_ADVISOR_SYSTEM_PROMPT = """You are Luvr, a warm, empathetic, and honest dating advice assistant. You communicate via iMessage, so keep your responses conversational and concise — like texting a wise, non-judgmental friend.
 
 ## Your Personality
@@ -33,6 +35,38 @@ PHOTO_ANALYSIS_PROMPT = """You are analyzing a screenshot or photo that someone 
 Describe what you see in the image factually. Then, if relevant, provide kind but honest dating advice based on what's shown. Keep it conversational and concise (iMessage-style).
 
 If the image doesn't seem related to dating/relationships, gently note that and ask what they'd like help with."""
+
+LANGUAGE_INSTRUCTION_EN = (
+    "\n## Language\n"
+    "The user is writing in English. Always respond in English."
+)
+
+LANGUAGE_INSTRUCTION_KO = (
+    "\n## Language\n"
+    "The user is writing in Korean. Always respond in Korean (한국어). "
+    "Keep the same warm, empathetic, conversational tone."
+)
+
+LANGUAGE_INSTRUCTION_MIXED = (
+    "\n## Language\n"
+    "The user is mixing Korean and English. Match their mix naturally — "
+    "respond using the same blend they use. If the last message is mainly Korean, reply in Korean; "
+    "if mainly English, reply in English."
+)
+
+
+def build_system_prompt(user_message_text: str) -> str:
+    """Return the full system prompt with a language instruction appended when appropriate."""
+    prompt = DATING_ADVISOR_SYSTEM_PROMPT
+    lang = detect_language(user_message_text)
+    if lang == "ko":
+        prompt += LANGUAGE_INSTRUCTION_KO
+    elif lang == "mixed":
+        prompt += LANGUAGE_INSTRUCTION_MIXED
+    else:
+        prompt += LANGUAGE_INSTRUCTION_EN
+    return prompt
+
 
 VOICE_MEMO_SYSTEM_EXTRA = """The following is a transcription of a voice memo the user sent. They're speaking aloud about their dating/relationship situation. Respond as you normally would — warm, empathetic, and practical. Treat the transcribed text as their message to you."""
 
