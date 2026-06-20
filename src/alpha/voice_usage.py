@@ -5,6 +5,7 @@ from __future__ import annotations
 from src.alpha.registry import AlphaUserRegistry, UsageLimitResult
 
 VOICE_FEATURE = "voice"
+DEFAULT_VOICE_LIMIT = 10
 
 
 def check_voice_usage_limit(
@@ -12,7 +13,7 @@ def check_voice_usage_limit(
     *,
     user_id: str,
 ) -> UsageLimitResult:
-    return registry.check_limit(user_id=user_id, feature=VOICE_FEATURE)
+    return registry.check_limit(user_id=user_id, feature=VOICE_FEATURE, limit=DEFAULT_VOICE_LIMIT)
 
 
 def record_successful_voice_usage(
@@ -21,7 +22,7 @@ def record_successful_voice_usage(
     user_id: str,
 ) -> UsageLimitResult:
     registry.increment_usage(user_id=user_id, feature=VOICE_FEATURE)
-    return registry.check_limit(user_id=user_id, feature=VOICE_FEATURE)
+    return registry.check_limit(user_id=user_id, feature=VOICE_FEATURE, limit=DEFAULT_VOICE_LIMIT)
 
 
 def voice_limit_response(limit: UsageLimitResult) -> str:

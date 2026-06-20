@@ -14,7 +14,7 @@ def _registry(tmp_path: Path) -> AlphaUserRegistry:
 
 def test_voice_usage_limit_allows_until_monthly_quota(tmp_path: Path) -> None:
     registry = _registry(tmp_path)
-    profile = registry.get_or_create_for_telegram(telegram_user_id=123)
+    profile = registry.get_or_create_for_telegram(telegram_user_id=123, telegram_chat_id=456)
 
     first_check = check_voice_usage_limit(registry, user_id=profile.user_id)
 
@@ -26,7 +26,7 @@ def test_voice_usage_limit_allows_until_monthly_quota(tmp_path: Path) -> None:
 
 def test_voice_usage_increments_only_after_success(tmp_path: Path) -> None:
     registry = _registry(tmp_path)
-    profile = registry.get_or_create_for_telegram(telegram_user_id=123)
+    profile = registry.get_or_create_for_telegram(telegram_user_id=123, telegram_chat_id=456)
 
     for _ in range(10):
         result = record_successful_voice_usage(registry, user_id=profile.user_id)
@@ -43,7 +43,7 @@ def test_voice_usage_increments_only_after_success(tmp_path: Path) -> None:
 
 def test_voice_limit_response_distinguishes_allowed_and_blocked(tmp_path: Path) -> None:
     registry = _registry(tmp_path)
-    profile = registry.get_or_create_for_telegram(telegram_user_id=123)
+    profile = registry.get_or_create_for_telegram(telegram_user_id=123, telegram_chat_id=456)
 
     allowed = check_voice_usage_limit(registry, user_id=profile.user_id)
     assert voice_limit_response(allowed) == "Voice memo ready. 10 voice messages left this month."
