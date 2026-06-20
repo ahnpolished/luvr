@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from contextlib import nullcontext
 from dataclasses import dataclass
 from importlib import import_module
 from typing import Any
@@ -59,6 +60,7 @@ def run_weave_conversation_eval(
     predict: Callable[[dict[str, Any]], Any],
     project: str,
     eval_name: str = DEFAULT_CONVERSATION_EVAL_NAME,
+    span_labels: Mapping[str, Any] | None = None,
 ) -> Any:
     """Run the named conversation eval in Weave when the optional SDK is installed."""
 
@@ -67,5 +69,9 @@ def run_weave_conversation_eval(
 
     dataset = [case.as_weave_row() for case in build_conversation_eval_cases(eval_name)]
     evaluation = weave.Evaluation(name=eval_name, dataset=dataset)
+    labels = {key: value for key, value in (span_labels or {}).items() if value is not None}
+    attributes = getattr(weave, "attributes", None)
+    span_context = attributes(labels) if labels and callable(attributes) else nullcontext()
 
-    return evaluation.evaluate(predict)
+    with span_context:
+        return evaluation.evaluate(predict)
