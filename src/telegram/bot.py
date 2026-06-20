@@ -9,9 +9,10 @@ from typing import Any
 import structlog
 from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters
 
+from src.alpha_auth import build_linking_url
 from src.llm.client import LLMClient, create_llm_client
 from src.telegram.bridge_client import TelegramBridgeClient
-from src.telegram.handlers import handle_photo, handle_start, handle_text, handle_voice
+from src.telegram.handlers import handle_link, handle_photo, handle_start, handle_text, handle_voice
 
 logger = structlog.get_logger(__name__)
 
@@ -154,6 +155,9 @@ def _register_handlers(app: Application[object, object, object, object]) -> None
     # /start command
     app.add_handler(CommandHandler("start", handle_start))
 
+    # /link command — send onboarding deep-link
+    app.add_handler(CommandHandler("link", _build_handler(handle_link)))
+
     # Text messages (excluding commands)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, _build_handler(handle_text)))
 
@@ -177,3 +181,8 @@ def _build_handler(handler_fn: Any) -> Any:
         await handler_fn(update, context, bridge_client=bc, llm_client=lc)
 
     return wrapper
+
+
+def _build_linking_url(*, telegram_user_id: int, telegram_chat_id: int | None = None) -> str:
+    """Build a deep-link URL for Telegram-web auth linking (delegates to alpha_auth)."""
+    return build_linking_url(telegram_user_id=telegram_user_id, telegram_chat_id=telegram_chat_id)

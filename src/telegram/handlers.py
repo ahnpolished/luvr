@@ -9,6 +9,7 @@ from __future__ import annotations
 import structlog
 from telegram.ext import ContextTypes
 
+from src.alpha_auth import build_linking_url
 from src.llm.client import LLMClient
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.models import InternalMessage, TelegramAttachment, TelegramMessageType
@@ -269,3 +270,29 @@ async def handle_voice(
 
 # Conditional import to avoid circular issues at module level
 from src.config import settings  # noqa: E402
+
+
+async def handle_link(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    bridge_client: TelegramBridgeClient | None = None,
+    llm_client: LLMClient | None = None,
+) -> None:
+    """Handle the /link command — send a deep-link to web auth/onboarding."""
+    if update.message is None:
+        return
+
+    chat_id = update.message.chat_id
+    from_user = update.message.from_user
+    telegram_user_id = from_user.id if from_user else chat_id
+
+    logger.info("link_command", chat_id=chat_id, telegram_user_id=telegram_user_id)
+
+    url = build_linking_url(telegram_user_id=telegram_user_id, telegram_chat_id=chat_id)
+    await update.message.reply_text(
+        "🔗 Here's your personal onboarding link:\n\n"
+        f"{url}\n\n"
+        "Open this link on your phone to authenticate and set up your profile. "
+        "This link expires in 10 minutes.",
+        disable_web_page_preview=True,
+    )

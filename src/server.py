@@ -10,7 +10,12 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from src.alpha.registry import AlphaUserRegistry
-from src.alpha_auth import _get_alpha_code, create_alpha_token, decode_alpha_token
+from src.alpha_auth import (
+    _get_alpha_code,
+    create_alpha_token,
+    decode_alpha_token,
+    decode_linking_token,
+)
 from src.bridge.client import BlueBubblesClient
 from src.config import settings
 from src.handler.pipeline import MessagePipeline
@@ -100,7 +105,17 @@ async def auth_alpha_exchange(request: Request) -> JSONResponse:
     if not alpha_code or code != alpha_code:
         return JSONResponse({"detail": "invalid alpha code"}, status_code=401)
 
+    linking_token = body.get("linking_token")
     telegram_user_id = body.get("telegram_user_id")
+    linking_completed = False
+
+    if linking_token:
+        try:
+            link_payload = decode_linking_token(linking_token)
+            telegram_user_id = int(link_payload["telegram_user_id"])
+            linking_completed = True
+        except ValueError as exc:
+            return JSONResponse({"detail": str(exc)}, status_code=401)
     profile = alpha_registry.get_or_create_for_telegram(
         telegram_user_id=int(telegram_user_id) if telegram_user_id else 0,
         telegram_chat_id=body.get("telegram_chat_id", 0),
@@ -119,6 +134,7 @@ async def auth_alpha_exchange(request: Request) -> JSONResponse:
             "display_name": profile.display_name,
             "auth_completed": profile.auth_completed,
             "session_token": session_token,
+            "linking_completed": linking_completed,
         }
     )
 
