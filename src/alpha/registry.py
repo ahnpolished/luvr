@@ -19,6 +19,9 @@ class UsageLimitResult(BaseModel):
 
     allowed: bool
     remaining: int
+    used: int = 0
+    limit: int = 0
+    reset_policy: str = "monthly"
 
 
 class AlphaUserProfile(BaseModel):
@@ -206,12 +209,23 @@ class AlphaUserRegistry:
         profile = self.get_profile(user_id)
         used = profile.usage_counters.get(feature, 0)
         remaining = max(limit - used, 0)
-        return UsageLimitResult(allowed=used < limit, remaining=remaining)
+        return UsageLimitResult(allowed=used < limit, remaining=remaining, used=used, limit=limit)
 
     def increment_usage(self, user_id: str, feature: str, *, amount: int = 1) -> AlphaUserProfile:
         """Increment a feature usage counter after successful processing."""
         profile = self.get_profile(user_id)
         profile.usage_counters[feature] = profile.usage_counters.get(feature, 0) + amount
+        self._state.profiles[user_id] = profile
+        self._save_state()
+        return profile
+
+    def reset_usage(self, user_id: str, feature: str | None = None) -> AlphaUserProfile:
+        """Reset one feature counter or all counters for the next alpha period."""
+        profile = self.get_profile(user_id)
+        if feature is None:
+            profile.usage_counters.clear()
+        else:
+            profile.usage_counters.pop(feature, None)
         self._state.profiles[user_id] = profile
         self._save_state()
         return profile
