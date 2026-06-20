@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from src.alpha.registry import AlphaUserRegistry
-from src.alpha.usage_limits import AlphaUsageLimiter, DEFAULT_ALPHA_LIMITS
+from src.alpha.usage_limits import DEFAULT_ALPHA_LIMITS, AlphaUsageLimiter
 
 
 @pytest.fixture
