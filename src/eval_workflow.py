@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from contextlib import nullcontext
 from dataclasses import dataclass
 from importlib import import_module
 from typing import Any
+
+from src.weave_spans import conversation_span_attributes
 
 DEFAULT_CONVERSATION_EVAL_NAME = "luvr-eval-v1"
 
@@ -69,9 +70,6 @@ def run_weave_conversation_eval(
 
     dataset = [case.as_weave_row() for case in build_conversation_eval_cases(eval_name)]
     evaluation = weave.Evaluation(name=eval_name, dataset=dataset)
-    labels = {key: value for key, value in (span_labels or {}).items() if value is not None}
-    attributes = getattr(weave, "attributes", None)
-    span_context = attributes(labels) if labels and callable(attributes) else nullcontext()
 
-    with span_context:
+    with conversation_span_attributes(span_labels or {}):
         return evaluation.evaluate(predict)
