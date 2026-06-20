@@ -1,0 +1,105 @@
+name: Terraform Apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/**'
+
+permissions:
+  contents: read
+
+jobs:
+  staging:
+    name: Apply Staging
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: infra/envs/staging
+
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_vercel_api_token: ${{ secrets.VERCEL_API_TOKEN }}
+      TF_VAR_railway_api_token: ${{ secrets.RAILWAY_API_TOKEN }}
+      VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.5"
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="endpoints={s3=${{ secrets.R2_ENDPOINT }}}" \
+            -backend-config="access_key=${{ secrets.R2_ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.R2_SECRET_KEY }}" \
+            -backend-config="region=auto" \
+            -backend-config="skip_credentials_validation=true" \
+            -backend-config="skip_region_validation=true" \
+            -backend-config="skip_requesting_account_id=true" \
+            -backend-config="skip_metadata_api_check=true" \
+            -backend-config="skip_s3_checksum=true"
+
+      - name: Terraform Apply (Staging)
+        run: |
+          terraform apply -auto-approve \
+            -var="shared_env_vars=${{ toJSON(secrets.STAGING_SHARED_ENV_VARS) }}" \
+            -var="api_env_vars=${{ toJSON(secrets.STAGING_API_ENV_VARS) }}" \
+            -var="telegram_env_vars=${{ toJSON(secrets.STAGING_TELEGRAM_ENV_VARS) }}"
+
+  production:
+    name: Apply Production
+    needs: staging
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      # GitHub Environments can require manual approval via required reviewers
+
+    defaults:
+      run:
+        working-directory: infra/envs/production
+
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_vercel_api_token: ${{ secrets.VERCEL_API_TOKEN }}
+      TF_VAR_railway_api_token: ${{ secrets.RAILWAY_API_TOKEN }}
+      VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.5"
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="endpoints={s3=${{ secrets.R2_ENDPOINT }}}" \
+            -backend-config="access_key=${{ secrets.R2_ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.R2_SECRET_KEY }}" \
+            -backend-config="region=auto" \
+            -backend-config="skip_credentials_validation=true" \
+            -backend-config="skip_region_validation=true" \
+            -backend-config="skip_requesting_account_id=true" \
+            -backend-config="skip_metadata_api_check=true" \
+            -backend-config="skip_s3_checksum=true"
+
+      - name: Terraform Apply (Production)
+        run: |
+          terraform apply -auto-approve \
+            -var="shared_env_vars=${{ toJSON(secrets.PROD_SHARED_ENV_VARS) }}" \
+            -var="api_env_vars=${{ toJSON(secrets.PROD_API_ENV_VARS) }}" \
+            -var="telegram_env_vars=${{ toJSON(secrets.PROD_TELEGRAM_ENV_VARS) }}"
