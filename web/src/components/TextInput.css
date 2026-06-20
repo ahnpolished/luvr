@@ -1,0 +1,75 @@
+.lv-textinput {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.lv-textinput__label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+}
+
+.lv-textinput__field {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lv-textinput__field:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px var(--color-accent-tint);
+}
+
+.lv-textinput__field--error {
+  border-color: #d9534f;
+}
+
+.lv-textinput__adornment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 46px;
+  padding: 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  border-right: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-alt);
+}
+
+.lv-textinput__input {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0 16px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-text);
+  outline: none;
+}
+
+.lv-textinput__helper {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-faint);
+  margin: 0;
+}
+
+.lv-textinput__error {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #d9534f;
+  margin: 0;
+}

@@ -1,0 +1,61 @@
+.lv-context__body {
+  padding: 28px 28px 36px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+}
+
+.lv-context__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
+}
+
+.lv-context__body h2 {
+  font-size: 30px;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.lv-context__lede {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+}
+
+.lv-context__note {
+  background: var(--color-accent-tint);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: auto;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.lv-context__note-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.lv-context__note p {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.lv-context__primary {
+  margin-top: 12px;
+}

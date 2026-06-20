@@ -1,0 +1,64 @@
+.lv-stepheader {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lv-stepheader__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.lv-stepheader__wordmark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--color-text);
+}
+
+.lv-stepheader__logo {
+  width: 22px;
+  height: 22px;
+}
+
+.lv-stepheader__dot {
+  color: var(--color-accent);
+}
+
+.lv-stepheader__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-faint);
+  letter-spacing: 0.04em;
+}
+
+.lv-stepheader__progress {
+  display: flex;
+  gap: 6px;
+  padding: 0 26px;
+}
+
+.lv-stepheader__segment {
+  flex: 1;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+}
+
+.lv-stepheader__segment--filled {
+  background: var(--color-brand);
+}
+
+.lv-stepheader__eyebrow {
+  padding: 0 26px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
+}

@@ -1,0 +1,63 @@
+.lv-auth__body {
+  padding: 38px 28px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+}
+
+.lv-auth__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
+}
+
+.lv-auth__body h2 {
+  font-size: 30px;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.lv-auth__lede {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+}
+
+.lv-auth__primary-action {
+  margin-top: 8px;
+}
+
+.lv-auth__divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0;
+}
+
+.lv-auth__divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border-subtle);
+}
+
+.lv-auth__divider-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+}
+
+.lv-auth__fineprint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--color-text-faint);
+  margin: auto 0 0;
+  padding-top: 12px;
+}
