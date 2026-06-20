@@ -2,6 +2,50 @@
 
 from __future__ import annotations
 
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+
+def test_pytest_import_does_not_load_dotenv_secrets(tmp_path):
+    """Importing config under pytest must not read a local .env file."""
+    secret_token = "dotenv-telegram-token-sentinel"
+    (tmp_path / ".env").write_text(
+        f"TELEGRAM_BOT_TOKEN={secret_token}\nOPENAI_API_KEY=dotenv-openai-key-sentinel\n",
+        encoding="utf-8",
+    )
+
+    repo_root = Path(__file__).resolve().parents[1]
+    env = os.environ.copy()
+    env.update(
+        {
+            "PYTHONPATH": str(repo_root),
+            "PYTEST_CURRENT_TEST": "tests/test_config.py::test_pytest_import_does_not_load_dotenv_secrets (call)",
+        }
+    )
+    for key in ("TELEGRAM_BOT_TOKEN", "OPENAI_API_KEY"):
+        env.pop(key, None)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import json, pytest; from src.config import settings; "
+            "print(json.dumps({'telegram_bot_token': settings.telegram_bot_token, "
+            "'openai_api_key': settings.openai_api_key}))",
+        ],
+        cwd=tmp_path,
+        env=env,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    loaded = json.loads(result.stdout)
+    assert loaded == {"telegram_bot_token": "", "openai_api_key": None}
+
 
 def test_settings_defaults(monkeypatch):
     """Test that settings load defaults correctly."""
