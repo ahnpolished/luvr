@@ -8,6 +8,7 @@ import structlog
 
 from src.bridge.models import WebhookPayload
 from src.llm.client import LLMClient
+from src.llm.prompts import build_system_prompt
 
 if TYPE_CHECKING:
     from src.telegram.models import InternalMessage
@@ -52,7 +53,10 @@ class TextHandler:
 
         logger.info("handling_text_message", text_len=len(user_text))
 
-        response = await self.llm_client.generate_response(user_message=user_text)
+        response = await self.llm_client.generate_response(
+            user_message=user_text,
+            system_prompt=build_system_prompt(user_text),
+        )
 
         logger.info("text_response_generated", response_len=len(response))
         return response
