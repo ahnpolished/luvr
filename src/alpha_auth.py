@@ -94,3 +94,57 @@ def decode_alpha_token(
     # Fix up iat back to a reasonable timestamp display
     payload["iat"] = str(iat - _TOKEN_MAX_AGE_SECONDS)
     return payload
+
+
+_LINKING_MAX_AGE_SECONDS = 600  # 10 minutes
+
+
+def create_linking_token(
+    *,
+    telegram_user_id: int,
+    telegram_chat_id: int | None = None,
+    max_age_seconds: int = _LINKING_MAX_AGE_SECONDS,
+) -> str:
+    """Create a short-lived linking token for Telegram-web deep linking.
+
+    Embeds telegram_user_id AND telegram_chat_id so the web flow can
+    associate the authenticated session with the correct chat.
+    """
+    # Build payload manually to include chat_id
+    import json
+    from base64 import urlsafe_b64encode
+
+    key = _get_secret().encode("utf-8")
+    payload_bytes = json.dumps(
+        {
+            "user_id": f"link_{telegram_user_id}",
+            "telegram_user_id": str(telegram_user_id),
+            "telegram_chat_id": str(telegram_chat_id) if telegram_chat_id else "",
+            "iat": int(time.time()) + max_age_seconds,
+        },
+        separators=(",", ":"),
+    ).encode("utf-8")
+    encoded = urlsafe_b64encode(payload_bytes).rstrip(b"=").decode("ascii")
+    signature = hmac.new(key, encoded.encode("ascii"), hashlib.sha256).hexdigest()
+    return f"{encoded}.{signature}"
+
+
+def decode_linking_token(token: str) -> dict[str, str]:
+    """Decode a linking token, adding purpose metadata."""
+    payload = decode_alpha_token(token, max_age_seconds=_LINKING_MAX_AGE_SECONDS)
+    payload["purpose"] = "telegram_web_linking"
+    payload["telegram_chat_id"] = payload.get("telegram_chat_id", "")
+    return payload
+
+
+def build_linking_url(
+    *,
+    telegram_user_id: int,
+    telegram_chat_id: int | None = None,
+) -> str:
+    """Build a deep-link URL for Telegram-web auth linking."""
+    base = os.environ.get("ALPHA_WEB_BASE_URL", "http://localhost:8000")
+    return (
+        f"{base}/auth/alpha/exchange?linking_token="
+        f"{create_linking_token(telegram_user_id=telegram_user_id, telegram_chat_id=telegram_chat_id)}"
+    )
