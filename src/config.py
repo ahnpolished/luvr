@@ -1,12 +1,16 @@
 """Centralized configuration using pydantic-settings.
 
-All environment variables are loaded from .env file and validated on startup.
+The runtime singleton loads environment variables from ``.env`` and validates
+settings on startup. Tests intentionally bypass dotenv loading to avoid leaking
+real local secrets into test output.
 """
 
 from __future__ import annotations
 
+import os
+import sys
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,7 +19,7 @@ class Settings(BaseSettings):
     """Luvr application settings loaded from environment variables."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=None,
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -86,5 +90,16 @@ class Settings(BaseSettings):
         return self.max_attachment_size_mb * 1024 * 1024
 
 
+def _running_under_pytest() -> bool:
+    """Return True when this process is pytest or a pytest-spawned helper."""
+    return "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules
+
+
+def load_settings(env_file: str | None = ".env") -> Settings:
+    """Load settings, skipping dotenv files under pytest for secret hygiene."""
+    kwargs: dict[str, Any] = {"_env_file": None if _running_under_pytest() else env_file}
+    return Settings(**kwargs)
+
+
 # Singleton settings instance
-settings = Settings()
+settings = load_settings()

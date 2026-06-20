@@ -233,12 +233,14 @@ class TestAsyncMain:
 
 def test_main_function():
     """Test the synchronous main() entrypoint."""
+    mock_coro = object()
     with (
-        patch("src.telegram_server.async_main", new=AsyncMock()),
+        patch("src.telegram_server.async_main", new=MagicMock(return_value=mock_coro)) as mock_async_main,
         patch("asyncio.run") as mock_run,
     ):
         from src.telegram_server import main
 
         main()
 
-        mock_run.assert_called_once()
+        mock_async_main.assert_called_once_with()
+        mock_run.assert_called_once_with(mock_coro)
