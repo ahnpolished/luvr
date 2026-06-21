@@ -1,0 +1,137 @@
+.card-spread {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  perspective: 1100px;
+  padding: 6px 0;
+}
+
+.card-spread__card {
+  flex: none;
+  width: 58px;
+  transition: all 0.4s ease;
+}
+
+.card-spread__card--active {
+  transform: translateY(-4px);
+}
+
+.card-spread__card--dimmed {
+  opacity: 0.5;
+}
+
+.card-spread__inner {
+  position: relative;
+  width: 58px;
+  height: 92px;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.card-spread__inner--flipped {
+  transform: rotateY(180deg);
+}
+
+.card-spread__inner--glow {
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--orb-gold, #C9A24B) 50%, transparent));
+}
+
+.card-spread__back,
+.card-spread__face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 10px;
+}
+
+.card-spread__back {
+  background: linear-gradient(160deg, #2A1F19, #170F0C);
+  border: 1px solid rgba(201, 162, 75, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-spread__back-diamond {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(201, 162, 75, 0.6);
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-spread__back-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--orb-gold, #C9A24B);
+}
+
+.card-spread__face {
+  transform: rotateY(180deg);
+  background: linear-gradient(170deg, var(--card-face-gradient-start, #F7EFE1), var(--card-face-gradient-end, #EADFCB));
+  border: 1px solid rgba(201, 162, 75, 0.55);
+  overflow: hidden;
+}
+
+.card-spread__face--reversed {
+  transform: rotateY(180deg) rotate(180deg);
+}
+
+.card-spread__face-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
+
+.card-spread__numeral {
+  font-family: 'Spectral', serif;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: #9A7B33;
+}
+
+.card-spread__glyph {
+  font-size: 26px;
+  color: var(--orb-gold, #C9A24B);
+  line-height: 1;
+  margin: 3px 0;
+}
+
+.card-spread__name {
+  font-family: 'Spectral', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: #2A1E14;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.card-spread__reversed {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 6px;
+  letter-spacing: 0.1em;
+  color: #B5482E;
+}
+
+.card-spread__position {
+  display: block;
+  text-align: center;
+  margin-top: 5px;
+  font-family: 'Space Mono', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--orb-gold, #C9A24B);
+}

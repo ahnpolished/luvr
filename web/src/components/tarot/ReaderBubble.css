@@ -1,0 +1,39 @@
+@keyframes bubble-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reader-bubble {
+  align-self: flex-start;
+  max-width: 86%;
+  background: linear-gradient(165deg, rgba(247, 239, 227, 0.09), rgba(247, 239, 227, 0.04));
+  border: 1px solid rgba(201, 162, 75, 0.22);
+  color: #EFE5D6;
+  padding: 12px 15px;
+  border-radius: 16px 16px 16px 5px;
+  font-family: var(--font-reader, 'Spectral', serif);
+  font-size: 15px;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px -16px rgba(0, 0, 0, 0.8);
+  animation: bubble-rise 0.45s ease both;
+  white-space: pre-wrap;
+}
+
+.reader-bubble--past {
+  opacity: 0.32;
+  font-size: 13px;
+  animation: none;
+}
+
+.reader-bubble--user {
+  align-self: flex-end;
+  max-width: 78%;
+  background: var(--orb-accent, #FF6B61);
+  color: #fff;
+  border-radius: 16px 16px 5px 16px;
+  border: none;
+  font-family: var(--font-reader, 'Spectral', serif);
+  font-style: italic;
+  font-size: 13px;
+  box-shadow: none;
+}

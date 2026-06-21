@@ -1,0 +1,101 @@
+.card-fan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-fan__held {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  height: 96px;
+  align-items: flex-end;
+}
+
+.card-fan__held-slot {
+  width: 62px;
+  height: 90px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: rgba(247, 239, 227, 0.03);
+  border: 1px dashed rgba(247, 239, 227, 0.2);
+}
+
+.card-fan__held-slot--filled {
+  background: linear-gradient(160deg, #2A1F19, #150E0B);
+  border: 1px solid var(--orb-gold, #C9A24B);
+  box-shadow: 0 0 18px -6px color-mix(in srgb, var(--orb-gold, #C9A24B) 60%, transparent);
+  cursor: pointer;
+  animation: slot-pop 0.4s ease both;
+}
+
+@keyframes slot-pop {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  60% { transform: translateY(0) scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.card-fan__track {
+  position: relative;
+  height: 240px;
+  touch-action: none;
+  cursor: grab;
+  overflow: hidden;
+}
+
+.card-fan__track:active {
+  cursor: grabbing;
+}
+
+.card-fan__card {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  width: var(--fan-card-width, 74px);
+  height: var(--fan-card-height, 118px);
+  margin-left: calc(var(--fan-card-width, 74px) / -2);
+  border-radius: var(--fan-card-radius, 13px);
+  background: linear-gradient(160deg, var(--card-back-gradient-start, #2A1F19), var(--card-back-gradient-end, #150E0B));
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  box-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  will-change: transform;
+}
+
+.card-fan__card--selected {
+  border: 2px solid var(--orb-gold, #C9A24B);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--orb-gold, #C9A24B) 30%, transparent),
+    0 18px 36px -16px rgba(0, 0, 0, 0.9);
+}
+
+.card-fan__card-back {
+  position: absolute;
+  inset: 7px;
+  border-radius: 11px;
+  border: 1px solid rgba(201, 162, 75, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-fan__diamond {
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(201, 162, 75, 0.6);
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-fan__diamond-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orb-gold, #C9A24B);
+}
