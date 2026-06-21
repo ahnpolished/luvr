@@ -1,15 +1,10 @@
 # --------------------------------------------------------------------
 # R2 backend (S3-compatible) for Terraform state
 #
-# The actual bucket, access key, and secret are provided via CI:
-#   terraform init \
-#     -backend-config="bucket=$TF_STATE_BUCKET" \
-#     -backend-config="endpoint=$R2_ENDPOINT" \
-#     -backend-config="access_key=$R2_ACCESS_KEY" \
-#     -backend-config="secret_key=$R2_SECRET_KEY"
+# Configured per official Cloudflare guide:
+#   https://developers.cloudflare.com/terraform/advanced-topics/remote-backend/
 #
-# The bucket and R2 credentials must be created manually as a one-time
-# step outside of Terraform before the first apply.
+# Secrets are passed via -backend-config in CI (never committed).
 # --------------------------------------------------------------------
 
 terraform {

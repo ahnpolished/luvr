@@ -61,8 +61,10 @@ railway.json               # Multi-service config for Railway (api + telegram-wo
 
 1. **Cloudflare R2 bucket** for Terraform state:
    ```bash
-   wrangler r2 bucket create luvr-terraform-state
+   wrangler r2 bucket create luvr-tf
    ```
+   Or create via Cloudflare Dashboard → R2 → Create bucket.
+   See official guide: https://developers.cloudflare.com/terraform/advanced-topics/remote-backend/
 
 2. **R2 S3-compatible API token** with Object Read & Write.
    Store in GitHub Actions secrets:
