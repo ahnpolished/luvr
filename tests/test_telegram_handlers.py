@@ -727,7 +727,7 @@ async def test_handle_text_uses_selected_persona():
 
     registry = AlphaUserRegistry()
     profile = registry.get_or_create_for_telegram(telegram_user_id=999, telegram_chat_id=123456)
-    registry.update_profile(profile.user_id, persona="storyteller")
+    registry.update_profile(profile.user_id, auth_completed=True, onboarding_completed=True, persona="storyteller")
 
     ctx = _mock_context(bridge_client=mock_bc, llm_client=mock_llm)
     ctx.bot_data["alpha_registry"] = registry

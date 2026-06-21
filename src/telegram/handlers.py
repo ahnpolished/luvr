@@ -21,6 +21,18 @@ from src.llm.tarot import TAROT_DECK, build_tarot_prompt
 from src.tarot.images import CARD_SLUGS, card_image_path, random_cards
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.models import InternalMessage, TelegramAttachment, TelegramMessageType
+from src.telegram.onboarding import (
+    ANONYMOUS_PERSONA_BLOCK_TEXT,
+    ANONYMOUS_TAROT_BLOCK_TEXT,
+    ANONYMOUS_UPSELL_KEYBOARD,
+    JUST_COMPLETED_TEXT,
+    ONBOARDING_KEYBOARD,
+    ONBOARDING_PROMPT_TEXT,
+    PENDING_REMINDER_TEXT,
+    OnboardingDecision,
+    is_anonymous_session,
+    onboarding_gate,
+)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 
 logger = structlog.get_logger(__name__)
@@ -41,11 +53,26 @@ CARD_NAME_BY_SLUG: dict[str, str] = dict(zip(CARD_SLUGS, [card["name_en"] for ca
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle the /start command — send a friendly welcome message."""
+    """Handle the /start command — route through onboarding gate."""
     if update.message is None:
         return
-    logger.info("start_command", chat_id=update.message.chat_id)
-    await update.message.reply_text(WELCOME_MESSAGE)
+
+    chat_id = update.message.chat_id
+    logger.info("start_command", chat_id=chat_id)
+
+    decision = await onboarding_gate(update, context)
+
+    if decision == OnboardingDecision.PROCEED:
+        await update.message.reply_text(WELCOME_MESSAGE)
+    elif decision == OnboardingDecision.JUST_COMPLETED:
+        await update.message.reply_text(JUST_COMPLETED_TEXT)
+    elif decision == OnboardingDecision.PROMPT:
+        await update.message.reply_text(ONBOARDING_PROMPT_TEXT, reply_markup=ONBOARDING_KEYBOARD)
+    elif decision == OnboardingDecision.PENDING:
+        await update.message.reply_text(PENDING_REMINDER_TEXT)
+    elif decision == OnboardingDecision.ANONYMOUS:
+        # Already anonymous — just acknowledge
+        await update.message.reply_text(WELCOME_MESSAGE)
 
 
 async def handle_text(
@@ -72,6 +99,18 @@ async def handle_text(
     chat_id = update.message.chat_id
     text = update.message.text.strip()
     logger.info("telegram_text_received", chat_id=chat_id, text_len=len(text))
+
+    # --- Onboarding gate ---
+    decision = await onboarding_gate(update, context)
+    if decision == OnboardingDecision.PROMPT:
+        await update.message.reply_text(ONBOARDING_PROMPT_TEXT, reply_markup=ONBOARDING_KEYBOARD)
+        return
+    if decision == OnboardingDecision.PENDING:
+        await update.message.reply_text(PENDING_REMINDER_TEXT)
+        return
+    if decision == OnboardingDecision.JUST_COMPLETED:
+        await update.message.reply_text(JUST_COMPLETED_TEXT)
+        # Fall through — process the message after the welcome-back
 
     # --- Resolve runtime dependencies ---
     bc = bridge_client or context.bot_data.get("bridge_client")
@@ -149,6 +188,18 @@ async def handle_photo(
 
     chat_id = update.message.chat_id
     logger.info("telegram_photo_received", chat_id=chat_id)
+
+    # --- Onboarding gate ---
+    decision = await onboarding_gate(update, context)
+    if decision == OnboardingDecision.PROMPT:
+        await update.message.reply_text(ONBOARDING_PROMPT_TEXT, reply_markup=ONBOARDING_KEYBOARD)
+        return
+    if decision == OnboardingDecision.PENDING:
+        await update.message.reply_text(PENDING_REMINDER_TEXT)
+        return
+    if decision == OnboardingDecision.JUST_COMPLETED:
+        await update.message.reply_text(JUST_COMPLETED_TEXT)
+        # Fall through
 
     bc = bridge_client or context.bot_data.get("bridge_client")
     lc = llm_client or context.bot_data.get("llm_client")
@@ -234,6 +285,18 @@ async def handle_voice(
     chat_id = update.message.chat_id
     voice = update.message.voice
     logger.info("telegram_voice_received", chat_id=chat_id, duration=voice.duration)
+
+    # --- Onboarding gate ---
+    decision = await onboarding_gate(update, context)
+    if decision == OnboardingDecision.PROMPT:
+        await update.message.reply_text(ONBOARDING_PROMPT_TEXT, reply_markup=ONBOARDING_KEYBOARD)
+        return
+    if decision == OnboardingDecision.PENDING:
+        await update.message.reply_text(PENDING_REMINDER_TEXT)
+        return
+    if decision == OnboardingDecision.JUST_COMPLETED:
+        await update.message.reply_text(JUST_COMPLETED_TEXT)
+        # Fall through
 
     bc = bridge_client or context.bot_data.get("bridge_client")
     lc = llm_client or context.bot_data.get("llm_client")
@@ -341,6 +404,18 @@ async def handle_persona(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if update.message is None:
         return
 
+    # Check anonymous gate
+    if (
+        update.effective_user is not None
+        and update.effective_chat is not None
+        and is_anonymous_session(update.effective_user.id, update.effective_chat.id)
+    ):
+        await update.message.reply_text(
+            ANONYMOUS_PERSONA_BLOCK_TEXT,
+            reply_markup=ANONYMOUS_UPSELL_KEYBOARD,
+        )
+        return
+
     buttons = [
         [InlineKeyboardButton(label, callback_data=f"{PERSONA_CALLBACK_PREFIX}{slug}")]
         for slug, label in PERSONA_DISPLAY_NAMES.items()
@@ -395,6 +470,14 @@ async def handle_tarot(
     chat_id = update.message.chat_id
     from_user = update.message.from_user
     logger.info("tarot_command", chat_id=chat_id, telegram_user_id=from_user.id)
+
+    # Check anonymous gate
+    if is_anonymous_session(from_user.id, chat_id):
+        await update.message.reply_text(
+            ANONYMOUS_TAROT_BLOCK_TEXT,
+            reply_markup=ANONYMOUS_UPSELL_KEYBOARD,
+        )
+        return
 
     bc = bridge_client or context.bot_data.get("bridge_client")
     lc = llm_client or context.bot_data.get("llm_client")

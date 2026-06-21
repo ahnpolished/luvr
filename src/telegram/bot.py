@@ -32,6 +32,10 @@ from src.telegram.handlers import (
     handle_text,
     handle_voice,
 )
+from src.telegram.onboarding import (
+    ONBOARDING_CALLBACK_PREFIX,
+    handle_onboarding_callback,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -198,6 +202,9 @@ def _register_handlers(app: Application[Any, Any, Any, Any, Any, Any]) -> None:
     # /persona command — pick a persona; callback handles the button tap
     app.add_handler(CommandHandler("persona", handle_persona))
     app.add_handler(CallbackQueryHandler(handle_persona_callback, pattern=f"^{PERSONA_CALLBACK_PREFIX}"))
+
+    # Onboarding inline keyboard callbacks (Set up profile / Continue anonymously)
+    app.add_handler(CallbackQueryHandler(handle_onboarding_callback, pattern=f"^{ONBOARDING_CALLBACK_PREFIX}"))
 
     # /tarot command — 3-card relationship reading
     app.add_handler(CommandHandler("tarot", _build_handler(handle_tarot)))
