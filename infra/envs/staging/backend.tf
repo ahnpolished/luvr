@@ -4,7 +4,7 @@
 # The actual bucket, access key, and secret are provided via CI:
 #   terraform init \
 #     -backend-config="bucket=$TF_STATE_BUCKET" \
-#     -backend-config="endpoints={s3=$R2_ENDPOINT}" \
+#     -backend-config="endpoints.s3=$R2_ENDPOINT" \
 #     -backend-config="access_key=$R2_ACCESS_KEY" \
 #     -backend-config="secret_key=$R2_SECRET_KEY"
 #
