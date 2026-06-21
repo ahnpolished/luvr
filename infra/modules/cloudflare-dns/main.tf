@@ -3,7 +3,7 @@
 #
 # Creates:
 #   - CNAME records for frontend (→ Vercel) and API (→ Railway)
-#   - Zone-level SSL/TLS override
+#   - Zone-level SSL/TLS settings
 #   - Rate-limit WAF rule on /auth/alpha/*
 #
 # NOTE: DNS records must first be created with proxied = false so
@@ -45,17 +45,6 @@ resource "cloudflare_zone_settings_override" "this" {
   settings {
     ssl             = var.ssl_mode
     min_tls_version = "1.2"
-    # Read-only settings (must be set to current values to avoid drift errors)
-    http2                       = "on"
-    mirage                      = "off"
-    origin_error_page_pass_thru = "off"
-    polish                      = "off"
-    prefetch_preload            = "off"
-    proxy_read_timeout          = "100"
-    response_buffering          = "off"
-    sort_query_string_for_cache = "off"
-    true_client_ip_header       = "off"
-    webp                        = "off"
   }
 }
 
