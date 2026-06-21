@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 
 from src.alpha.registry import AlphaUserRegistry
 from src.alpha_auth import (
@@ -104,9 +105,46 @@ async def webhook(request: Request) -> JSONResponse:
 # ------------------------------------------------------------------
 
 
-@app.post("/auth/alpha/exchange")  # type: ignore[misc]
-async def auth_alpha_exchange(request: Request) -> JSONResponse:
-    """Exchange an alpha invite code for a signed session token and profile."""
+@app.api_route("/auth/alpha/exchange", methods=["GET", "POST"])
+async def auth_alpha_exchange(request: Request) -> Response:
+    """Exchange an alpha invite code for a signed session token and profile.
+
+    GET (browser deep-link): reads linking_token from query params,
+    exchanges it, and redirects to the web app with the session token.
+
+    POST (API): reads from JSON body, returns JSON response.
+    """
+    # --- GET: deep-link from Telegram bot --------------------------------------------------
+    if request.method == "GET":
+        linking_token = request.query_params.get("linking_token", "")
+        if not linking_token:
+            return JSONResponse({"detail": "missing linking_token"}, status_code=400)
+
+        try:
+            link_payload = decode_linking_token(linking_token)
+            telegram_user_id = int(link_payload["telegram_user_id"])
+            telegram_chat_id = int(link_payload.get("telegram_chat_id", 0) or 0)
+        except ValueError as exc:
+            return JSONResponse({"detail": str(exc)}, status_code=401)
+
+        profile = alpha_registry.get_or_create_for_telegram(
+            telegram_user_id=telegram_user_id,
+            telegram_chat_id=telegram_chat_id,
+            telegram_username=None,
+            display_name=None,
+        )
+        alpha_registry.update_profile(profile.user_id, auth_completed=True)
+
+        session_token = create_alpha_token(
+            user_id=profile.user_id,
+            telegram_user_id=profile.telegram_user_id,
+        )
+
+        web_base_url = settings.alpha_web_app_url or os.environ.get("ALPHA_WEB_BASE_URL", "http://localhost:5173")
+        redirect_url = f"{web_base_url}/context?token={session_token}"
+        return RedirectResponse(url=redirect_url, status_code=303)
+
+    # --- POST: API (existing behavior) -----------------------------------------------------
     try:
         body = await request.json()
     except Exception:
