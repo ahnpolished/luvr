@@ -46,7 +46,8 @@ resource "cloudflare_zone_settings_override" "this" {
     ssl = var.ssl_mode
     min_tls_version = "1.2"
     # Explicitly set read-only settings to avoid drift errors
-    mirage = "off"
+    mirage             = "off"
+    proxy_read_timeout = "100"
   }
 }
 
@@ -72,7 +73,6 @@ resource "cloudflare_ruleset" "rate_limit" {
       period              = 10
       requests_per_period = var.waf_rate_limit_threshold
       mitigation_timeout  = 30
-      counting_expression = "(http.request.uri.path contains \"/auth/alpha/\")"
     }
   }
 }
