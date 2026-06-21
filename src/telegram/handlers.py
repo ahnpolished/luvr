@@ -33,7 +33,7 @@ from src.telegram.onboarding import (
     is_anonymous_session,
     onboarding_gate,
 )
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, WebAppInfo
 
 logger = structlog.get_logger(__name__)
 
@@ -508,7 +508,30 @@ async def handle_tarot(
     try:
         slugs = random_cards(3)
         card_names = [CARD_NAME_BY_SLUG[slug] for slug in slugs]
-        await update.message.reply_text("🔮 Shuffling the deck...")
+
+        # Send the Mini App button (primary interactive experience)
+        mini_app_url = settings.telegram_mini_app_url
+        if mini_app_url:
+            keyboard = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            "🔮 Open interactive reading",
+                            web_app=WebAppInfo(url=mini_app_url),
+                        )
+                    ]
+                ]
+            )
+            await update.message.reply_text(
+                "🔮 Your tarot reading awaits.\n\n"
+                "Open the interactive reading below for the full experience — "
+                "or I'll read your cards right here.",
+                reply_markup=keyboard,
+            )
+        else:
+            await update.message.reply_text("🔮 Shuffling the deck...")
+
+        # Classic text-based reading (works as fallback too)
         await bc.send_photos(
             [card_image_path(slug) for slug in slugs],
             caption=" • ".join(card_names),

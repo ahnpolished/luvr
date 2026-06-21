@@ -42,6 +42,7 @@ class Settings(BaseSettings):  # type: ignore[misc]  # pydantic-settings stub qu
     telegram_mode: Literal["polling", "webhook"] = "polling"
     telegram_webhook_url: str | None = None
     telegram_allowed_user_ids: str = ""  # comma-separated list of allowed user IDs
+    telegram_mini_app_url: str = ""  # URL for the tarot Mini App (e.g. https://luvr.vercel.app/tarot)
 
     @property
     def telegram_allowed_user_id_list(self) -> list[int]:

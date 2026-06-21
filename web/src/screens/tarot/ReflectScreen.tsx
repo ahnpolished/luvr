@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { EmberField } from '../../components/tarot';
 import { useTarot } from '../../state/tarot-context';
+import { sendReadingToTelegram } from './TarotScreen';
 import './ReflectScreen.css';
 
 export function ReflectScreen() {
@@ -12,13 +13,19 @@ export function ReflectScreen() {
   const synthesis = synthMessage?.text ?? 'The cards have spoken in their own way. Let the reading settle.';
   const takeaway = takeawayMessage?.text ?? 'Trust what you already know.';
 
+  const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp;
+
   const handleNewReading = useCallback(() => {
     window.location.reload();
   }, []);
 
   const handleSave = useCallback(() => {
-    alert('Save this reading by taking a screenshot! \u{1F4F8}');
-  }, []);
+    if (isTelegram) {
+      sendReadingToTelegram(takeaway);
+    } else {
+      alert('Save this reading by taking a screenshot! \u{1F4F8}');
+    }
+  }, [isTelegram, takeaway]);
 
   return (
     <div className="reflect">
