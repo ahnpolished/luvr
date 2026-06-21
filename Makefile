@@ -32,9 +32,13 @@ format:
 	@echo "🎨 Formatting..."
 	. $(VENV)/bin/activate && ruff format src/ tests/
 
+typecheck:
+	@echo "🔍 Type checking with ty..."
+	uv run ty check src/
+
 clean:
 	@echo "🧹 Cleaning up..."
-	rm -rf $(VENV) .pytest_cache .ruff_cache .mypy_cache htmlcov dist build *.egg-info
+	rm -rf $(VENV) .pytest_cache .ruff_cache htmlcov dist build *.egg-info
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 
 smoke-test:

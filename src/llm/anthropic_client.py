@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Any, cast
 
 import structlog
 from anthropic import APIError, AsyncAnthropic
@@ -55,7 +56,7 @@ class AnthropicClient(LLMClient):
                 model=self.model,
                 max_tokens=600,
                 system=system,
-                messages=[{"role": "user", "content": content}],
+                messages=cast(Any, [{"role": "user", "content": content}]),
                 temperature=0.85,
             )
 
@@ -103,7 +104,7 @@ class AnthropicClient(LLMClient):
                 model=self.model,
                 max_tokens=600,
                 system=DATING_ADVISOR_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": content}],
+                messages=cast(Any, [{"role": "user", "content": content}]),
                 temperature=0.85,
             )
 

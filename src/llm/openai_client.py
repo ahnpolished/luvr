@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Any, cast
 
 import structlog
 from openai import APIError, AsyncOpenAI
@@ -54,7 +55,7 @@ class OpenAIClient(LLMClient):
         try:
             response = await self._client.chat.completions.create(
                 model=self.model,
-                messages=messages,
+                messages=cast(Any, messages),
                 max_tokens=600,
                 temperature=0.85,
             )
@@ -100,7 +101,7 @@ class OpenAIClient(LLMClient):
         try:
             response = await self._client.chat.completions.create(
                 model=self.model,
-                messages=messages,
+                messages=cast(Any, messages),
                 max_tokens=600,
                 temperature=0.85,
             )
