@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import signal
+from pathlib import Path
 from typing import Any
 
 import structlog
@@ -19,6 +20,7 @@ from telegram.ext import (
 from src.alpha.registry import AlphaUserRegistry
 from src.alpha.tarot_usage import TarotUsageGate
 from src.alpha_auth import build_linking_url
+from src.config import settings
 from src.llm.client import LLMClient, create_llm_client
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.handlers import (
@@ -102,7 +104,9 @@ class LuvrBot:
     def alpha_registry(self) -> AlphaUserRegistry:
         """Lazy-initialize the alpha user registry (persona + tarot usage)."""
         if self._alpha_registry is None:
-            self._alpha_registry = AlphaUserRegistry()
+            self._alpha_registry = AlphaUserRegistry(
+                storage_path=Path(settings.alpha_registry_path),
+            )
         return self._alpha_registry
 
     @property

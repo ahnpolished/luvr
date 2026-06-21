@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import structlog
 from fastapi import FastAPI, Request
@@ -76,7 +77,9 @@ async def health_check() -> dict[str, str]:
     return {"status": "ok", "service": "luvr", "version": "0.1.0"}
 
 
-alpha_registry = AlphaUserRegistry()
+alpha_registry = AlphaUserRegistry(
+    storage_path=Path(settings.alpha_registry_path),
+)
 
 
 @app.post("/webhook")  # type: ignore[misc]

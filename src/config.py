@@ -46,6 +46,7 @@ class Settings(BaseSettings):  # type: ignore[misc]  # pydantic-settings stub qu
 
     # --- Alpha Web Auth ---
     alpha_web_app_url: str = "http://localhost:5173"  # Web app URL for redirect after auth
+    alpha_registry_path: str = "data/alpha_registry.json"  # Shared registry file (web + bot)
 
     @property
     def telegram_allowed_user_id_list(self) -> list[int]:
