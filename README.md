@@ -1,7 +1,7 @@
 # 💝 Luvr — Dating Advice Chatbot
 
-> **Like Poke, but for dating advice.**
-> An AI-powered chatbot that lives in iMessage or Telegram and gives you real, empathetic dating advice — via text, photos, and voice memos.
+> **Like texting a friend who actually knows what they're talking about.**
+> An AI-powered chatbot that lives in Telegram and gives you real, empathetic dating advice — via text, photos, and voice memos.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -10,32 +10,15 @@
 
 ## 🎯 What is Luvr?
 
-Luvr is a chatbot that gives **dating and relationship advice**. You talk to it just like you'd text a friend:
+Luvr is a Telegram chatbot that gives **dating and relationship advice**. You talk to it just like you'd text a friend:
 
 - **Text**: "Should I text him back tonight?"
 - **Photo**: Screenshot a confusing conversation → get analysis
-- **Voice memo**: Vent about your date → get thoughtful advice
-
-Luvr works on two platforms:
-
-| Platform | Bridge | Setup Complexity | Requires Mac? |
-|----------|--------|-----------------|---------------|
-| **iMessage** 💬 | BlueBubbles | Medium | ✅ Yes |
-| **Telegram** 🤖 | Telegram Bot API | Easy | ❌ No |
-
-### Telegram Version (NEW! 🎉)
-
-The Telegram version is the easiest way to get started. Just create a bot with @BotFather, set your API keys, and you're ready to go — no Mac required!
-
-### iMessage Version
-
-The iMessage version uses BlueBubbles to bridge iMessage to a REST API, allowing Luvr to read and respond to your iMessages on any device.
+- **Voice memo**: Vent about your date → get thoughtful advice + optional voice reply
 
 LLM-powered by OpenAI, Anthropic Claude, DeepSeek, or OpenCode (local LLM gateway).
 
 ## 🏗️ Architecture
-
-### Telegram Version
 
 ```
 ┌──────────┐     ┌──────────────────┐     ┌─────────────────┐     ┌──────────┐
@@ -55,86 +38,49 @@ LLM-powered by OpenAI, Anthropic Claude, DeepSeek, or OpenCode (local LLM gatewa
                  │     │        │          │            │
                  │     ▼        ▼          ▼            │
                  │   LLM     Vision     Whisper→LLM     │
+                 │                          │           │
+                 │                          ▼           │
+                 │                     TTS voice reply  │
                  └──────────────────────────────────────┘
+                        │
+                        │  /link command
+                        ▼
+                 ┌──────────────────────┐
+                 │    Web Onboarding    │
+                 │  (React + FastAPI)   │
+                 │                      │
+                 │  • Alpha auth        │
+                 │  • Instagram context │
+                 │  • Profile setup     │
+                 └──────────────────────┘
 ```
 
-### iMessage Version
+| Module | Description |
+|--------|-------------|
+| `telegram/` | Bot lifecycle, message handlers (text/photo/voice/tarot), command handlers (/start, /link) |
+| `llm/` | Abstract LLM interface + OpenAI, Anthropic, DeepSeek, OpenCode clients; prompts; tarot deck; language detection |
+| `handler/` | Message processing pipeline for iMessage bridge |
+| `bridge/` | BlueBubbles API client (iMessage) |
+| `media/` | Vision analysis, Whisper transcription, TTS speech synthesis |
+| `alpha/` | Alpha user registry, usage limits, voice quotas |
+| `tarot/` | Deterministic 3-card tarot reading UX flow |
+| `memory/` | mem0-backed per-user memory store (research prototype) |
+| `proactive/` | Manual check-in copy builder |
+| `web/` | React + TypeScript + Vite onboarding frontend |
 
-```
-┌──────────┐     ┌──────────────────┐     ┌─────────────────┐     ┌──────────┐
-│  iPhone  │────▶│  BlueBubbles     │────▶│  Luvr Bot       │────▶│   LLM    │
-│ iMessage │     │  (Mac Bridge)    │     │  (FastAPI)      │     │ (GPT-4o) │
-└──────────┘     └──────────────────┘     └─────────────────┘     └──────────┘
-                        │                           │
-                        │  Webhook                  │  API Calls
-                        │  (new msg)                │  (send msg)
-                        ▼                           ▼
-                 ┌──────────────────────────────────────┐
-                 │        Message Pipeline              │
-                 │  ┌──────┐ ┌───────┐ ┌────────┐      │
-                 │  │ Text │ │ Photo │ │ Voice  │      │
-                 │  │Handler│ │Handler│ │Handler │      │
-                 │  └──┬───┘ └──┬────┘ └───┬────┘      │
-                 │     │        │          │            │
-                 │     ▼        ▼          ▼            │
-                 │   LLM     Vision     Whisper→LLM     │
-                 └──────────────────────────────────────┘
-```
+Architecture details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Mac** with iMessage signed in
-- **Python 3.12+**
-- **BlueBubbles** server installed ([bluebubbles.app](https://bluebubbles.app))
-- **OpenAI API key** (for GPT-4o-mini + Whisper) **or** **Anthropic API key** (for Claude)
-
-### 1. Clone & Install
-
-```bash
-git clone https://github.com/ahnpolished/luvr.git
-cd luvr
-make install
-```
-
-### 2. Configure
-
-```bash
-cp .env.example .env
-# Edit .env with your API keys and BlueBubbles server URL
-```
-
-### 3. Set Up BlueBubbles
-
-1. Download and install [BlueBubbles](https://bluebubbles.app) on your Mac
-2. Configure it with your iMessage account
-3. Set a server password in BlueBubbles settings
-4. Note your server URL (usually `http://localhost:1234`)
-5. Configure webhook: set it to POST to `http://127.0.0.1:8000/webhook` (use 127.0.0.1, not localhost — BlueBubbles prefers IPv6 and won't reach the server)
-
-### 4. Run
-
-```bash
-make run
-```
-
-### 5. Test
-
-Send an iMessage to the account running BlueBubbles and ask for dating advice!
-
-Or run smoke tests (no iMessage needed):
-```bash
-make smoke-test
-```
-
-## 🤖 Telegram Quick Start
+## 🚀 Quick Start (Telegram)
 
 ### Prerequisites
 
 - **Python 3.12+**
 - **Telegram Bot Token** from [@BotFather](https://t.me/BotFather)
-- **OpenAI API key** (for GPT-4o-mini + Whisper) **or** **Anthropic API key** (for Claude)
+- An **LLM API key** — at least one of:
+  - **OpenAI API key** ([platform.openai.com](https://platform.openai.com/api-keys))
+  - **Anthropic API key** ([console.anthropic.com](https://console.anthropic.com))
+  - **DeepSeek API key** ([platform.deepseek.com](https://platform.deepseek.com))
+  - **OpenCode server** (local gateway, no external key needed)
 
 ### 1. Clone & Install
 
@@ -148,17 +94,16 @@ make install
 
 1. Open Telegram and chat with [@BotFather](https://t.me/BotFather)
 2. Send `/newbot` and follow the prompts
-3. Copy the bot token you receive (looks like `123456:ABCdef...`)
+3. Copy the bot token (looks like `123456:ABCdef...`)
 
 ### 3. Configure
 
 ```bash
 cp .env.example .env
-# Edit .env:
+# Edit .env with your settings:
 #   TELEGRAM_BOT_TOKEN=your_token_from_botfather
+#   LLM_PROVIDER=openai          # or anthropic, deepseek, opencode
 #   OPENAI_API_KEY=sk-your-key
-#   LLM_PROVIDER=openai
-#   PLATFORM=telegram
 ```
 
 ### 4. Run
@@ -173,74 +118,122 @@ Open Telegram, find your bot, and send `/start`!
 
 ---
 
-## 💬 iMessage Quick Start
-
-(Requires a Mac with iMessage signed in and BlueBubbles installed.)
-
 ## 📋 Features (v0.1.0)
 
-| Feature | iMessage | Telegram | Description |
-|---------|----------|----------|-------------|
-| 💬 Text messages | ✅ | ✅ | Plain text dating advice via LLM |
-| 📸 Photo analysis | ✅ | ✅ | Screenshot/photo analysis via vision model |
-| 🎤 Voice memos | ✅ | ✅ | Audio transcription via Whisper → advice |
-| 🔄 Multi-turn chat | ✅ | ✅ | Natural back-and-forth conversation |
-| 🔒 Safety filters | ✅ | ✅ | Crisis recognition + resource provision |
-| 🧪 Smoke tests | ✅ | ✅ | Test without real messaging |
-| 🤖 Telegram Bot API | — | ✅ | Easy setup, no Mac required |
+| Feature | Status | Description |
+|---------|--------|-------------|
+| 💬 Text messages | ✅ | Plain text dating advice via LLM |
+| 📸 Photo analysis | ✅ | Screenshot/photo analysis via vision model |
+| 🎤 Voice memos | ✅ | Audio transcription via Whisper → advice + optional TTS voice reply |
+| 🔄 Multi-turn chat | ✅ | Natural back-and-forth conversation |
+| 🔒 Safety filters | ✅ | Crisis recognition + resource provision |
+| 🃏 Tarot readings | ✅ | 3-card relationship spread with Major Arcana card images |
+| 🌐 Web onboarding | ✅ | Alpha auth, Telegram linking, Instagram context collection |
+| 🔗 /link command | ✅ | Deep-link from Telegram to web onboarding flow |
+| 🔑 Alpha auth | ✅ | HMAC-signed session tokens + invite-code gating |
+| 📊 Usage limits | ✅ | Per-feature quotas (voice messages, tarot readings) |
+| 🌍 Language detection | ✅ | Auto-detect Korean vs. English, bilingual prompts |
+| 📈 Weave tracing | ✅ | Optional W&B Weave spans with alpha user labels |
+| 🧪 Eval suite | ✅ | DeepEval safety, tone, friend-likeness; Korean eval cases |
+| 💾 Memory prototype | ✅ | mem0 per-user memory store (research, not wired into chat) |
+| 🤖 iMessage bridge | ✅ | BlueBubbles + FastAPI (requires Mac) |
+
+Full release status: [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md)
 
 ## 🛠️ Tech Stack
 
-- **Bridges**: [BlueBubbles](https://bluebubbles.app) (iMessage) | [python-telegram-bot](https://python-telegram-bot.org) (Telegram)
-- **Server**: FastAPI + uvicorn (iMessage) | python-telegram-bot polling/webhook (Telegram)
-- **LLM**: OpenAI GPT-4o-mini, Anthropic Claude, DeepSeek, or OpenCode (local gateway)
-- **Vision**: Native vision capabilities in OpenAI and Anthropic models
+- **Bot**: [python-telegram-bot](https://python-telegram-bot.org) (polling/webhook)
+- **Server**: FastAPI + uvicorn (iMessage bridge + web auth)
+- **Frontend**: React + TypeScript + Vite (web onboarding)
+- **LLM**: OpenAI GPT-4o-mini, Anthropic Claude, DeepSeek, OpenCode (local gateway)
+- **Vision**: Native vision in OpenAI and Anthropic models
 - **Transcription**: OpenAI Whisper
+- **TTS**: OpenAI TTS (tts-1 / tts-1-hd)
 - **Eval**: DeepEval for AI quality & safety testing
+- **Tracing**: W&B Weave (optional)
 - **Config**: pydantic-settings + python-dotenv
+- **Infra**: Cloudflare DNS + Vercel (Terraform-managed)
 
 ## 📁 Project Structure
 
 ```
 luvr/
 ├── src/
-│   ├── server.py              # FastAPI app entrypoint (iMessage)
+│   ├── server.py              # FastAPI + iMessage webhook + alpha auth endpoints
 │   ├── telegram_server.py     # Telegram bot entrypoint
-│   ├── config.py              # Centralized settings
-│   ├── logging_config.py      # Structured logging
-│   ├── bridge/                # BlueBubbles API client (iMessage)
-│   │   ├── client.py          # Async HTTP client
-│   │   └── models.py          # Pydantic models
+│   ├── config.py              # Centralized pydantic-settings
+│   ├── logging_config.py      # Structured JSON logging
+│   ├── alpha_auth.py          # HMAC token creation/verification + linking URLs
+│   ├── weave_spans.py         # W&B Weave conversation span helpers
+│   ├── eval_trace_policy.py   # Trace retention policy (7–30 days)
+│   ├── eval_trace_schema.py   # Structured eval trace models
+│   ├── eval_workflow.py       # Conversation eval workflow runner
 │   ├── telegram/              # Telegram bot module
-│   │   ├── bot.py             # Bot lifecycle + handler registration
-│   │   ├── handlers.py        # Message handlers (text/photo/voice)
+│   │   ├── bot.py             # LuvrBot lifecycle + handler registration
+│   │   ├── handlers.py        # /start, /link, text, photo, voice, tarot
 │   │   ├── bridge_client.py   # Telegram reply API client
 │   │   ├── models.py          # Internal message models
 │   │   ├── cli.py             # CLI wrapper
-│   │   └── __main__.py        # Entry point
+│   │   └── __main__.py        # `python -m src.telegram` entry point
 │   ├── handler/               # Message processing (iMessage)
 │   │   ├── pipeline.py        # Orchestrator
 │   │   ├── router.py          # Message type router
 │   │   ├── text_handler.py    # Text messages
 │   │   ├── photo_handler.py   # Photo/images
 │   │   └── voice_handler.py   # Voice memos
+│   ├── bridge/                # BlueBubbles API client (iMessage)
+│   │   ├── client.py          # Async HTTP client
+│   │   └── models.py          # Pydantic models
 │   ├── llm/                   # AI integration
-│   │   ├── client.py          # Abstract interface + factory
+│   │   ├── client.py          # Abstract interface + provider factory
 │   │   ├── openai_client.py   # OpenAI implementation
 │   │   ├── anthropic_client.py # Claude implementation
 │   │   ├── opencode_client.py # OpenCode (local gateway) impl
-│   │   └── prompts.py         # System prompts
-│   └── media/                 # Media processing
-│       ├── vision.py          # Image analysis
-│       └── transcription.py   # Whisper transcription
-├── tests/                     # Test suite
+│   │   ├── prompts.py         # System prompts
+│   │   ├── tarot.py           # Major Arcana deck + prompt builder
+│   │   └── language_detection.py # Korean/English detection
+│   ├── media/                 # Media processing
+│   │   ├── vision.py          # Image analysis
+│   │   ├── transcription.py   # Whisper transcription
+│   │   └── speech.py          # TTS voice reply synthesis
+│   ├── alpha/                 # Alpha user management
+│   │   ├── registry.py        # Profile storage + Telegram linking
+│   │   ├── usage_limits.py    # Feature quota enforcement
+│   │   ├── tarot_usage.py     # Tarot-specific usage checks
+│   │   └── voice_usage.py     # Voice message quota checks
+│   ├── tarot/                 # Tarot reading
+│   │   ├── flow.py            # Deterministic 3-card UX flow
+│   │   └── images.py          # Card image loading
+│   ├── memory/                # Memory prototype
+│   │   └── mem0_store.py      # mem0 per-user memory wrapper
+│   └── proactive/             # Proactive messaging
+│       └── checkin.py         # Manual check-in copy builder
+├── web/                       # React + TypeScript onboarding frontend
+│   └── src/
+│       ├── screens/           # Landing, Auth, InstagramContext, TelegramHandoff
+│       ├── components/        # PageShell, StepHeader, Button, Card, OTPInput, TextInput
+│       ├── state/             # OnboardingProvider + context
+│       ├── styles/            # Design tokens
+│       └── lib/               # Validation utilities
+├── tests/                     # pytest test suite
 │   └── eval/                  # DeepEval AI quality tests
+├── infra/                     # Terraform (Cloudflare DNS, Vercel)
 ├── scripts/                   # Utility scripts
 │   ├── setup.sh               # One-command setup
 │   ├── smoke_test.py          # iMessage smoke tests
-│   └── telegram_smoke_test.py # Telegram smoke tests
+│   ├── telegram_smoke_test.py # Telegram smoke tests
+│   ├── manual_proactive_checkin.py   # Manual proactive check-in
+│   ├── run_weave_conversation_eval.py # Weave eval runner
+│   └── generate_tarot_images.py      # Tarot card image generator
 ├── examples/                  # Example usage
-│   └── telegram_bot.py        # Standalone Telegram example
+├── docs/                      # Documentation
+│   ├── ARCHITECTURE.md        # Technical architecture
+│   ├── SETUP.md               # Step-by-step setup guide
+│   ├── SECURITY.md            # Security policy & baseline
+│   ├── DESIGN_BRIEF.md        # Product design brief
+│   ├── AUTH_MEMORY.md         # Auth + memory research
+│   ├── RELEASE_CHECKLIST.md   # v0.1.0 readiness checklist
+│   └── TODO.md                # Future roadmap & ideas
 ├── Makefile                   # Common commands
 ├── pyproject.toml             # Python project config
 └── .env.example               # Configuration template
@@ -249,25 +242,27 @@ luvr/
 ## 🔧 Development
 
 ```bash
-make install       # Install dependencies
-make run           # Start iMessage server
-make run-telegram  # Start Telegram bot
-make test          # Run tests
-make test-cov      # Run tests with coverage report
-make lint          # Run linter
-make format        # Format code
-make smoke-test    # Run iMessage smoke tests (needs API keys)
-make tg-smoke-test # Run Telegram smoke tests (no API keys needed)
-make eval          # Run eval suite (fast deterministic tests)
-make eval-slow     # Run full eval suite (includes slow tests)
-make eval-all      # Run ALL eval tests
+make install             # Install dependencies
+make run-telegram        # Start Telegram bot (polling mode)
+make run                 # Start iMessage server (FastAPI)
+make test                # Run tests
+make test-cov            # Run tests with coverage report
+make lint                # Run linter (ruff)
+make format              # Format code (ruff)
+make typecheck           # Type check (ty)
+make smoke-test          # Run iMessage smoke tests
+make tg-smoke-test       # Run Telegram smoke tests
+make eval                # Run eval suite (fast deterministic)
+make eval-slow           # Run full eval suite (includes slow tests)
+make eval-all            # Run ALL eval tests
+make generate-tarot-images  # Generate Major Arcana card images
 ```
 
 ## 🗺️ Roadmap
 
-- **v0.1.0** (current): Local dev environment, text + photo + voice support
-- **v0.2.0**: Multi-user support, conversation history, personality customization
-- **v0.3.0**: Cloud deployment, authentication, monitoring
+- **v0.1.0** (current): Telegram bot, text/photo/voice, tarot, web onboarding, alpha auth, usage limits, Weave evals
+- **v0.2.0**: Persistent product memory, conversation history, personality customization
+- **v0.3.0**: Multi-channel (iMessage revival, Kakaotalk), monitoring, production deployment
 - **v1.0.0**: Public release, App Store companion app
 
 ## 📄 License

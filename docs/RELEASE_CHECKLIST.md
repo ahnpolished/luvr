@@ -1,58 +1,54 @@
-# v0.1.0 Release Readiness Gate
+# v0.1.0 Release Readiness Checklist
 
-**Date:** 2026-06-20
-**Status:** All automated checks PASS. Manual tests pending.
+Last updated: 2026-06-20
 
 ## Automated Checks
 
-- [x] `pytest -W error` — 211 passed, 0 failed
-- [x] `ruff check src/ tests/` — All checks passed
-- [x] `mypy src` — Success: no issues found in 51 source files
-- [x] `.env` ignored — `git check-ignore -q .env` passes
-- [x] No token-shaped values in diff
+- [x] `pytest` passes — 211 passed, 0 failed
+- [x] `ruff check src/ tests/` passes — All checks passed
+- [x] `ty check src/` passes — No issues found
+- [x] Telegram smoke test passes with mock data — All handlers OK (text, photo, voice, error handling)
 
-## Manual Smoke Tests (need real Telegram bot)
+## Manual Verification
 
-- [ ] Text message → LLM response
-- [ ] Photo message → vision analysis + response
-- [ ] Voice memo → transcription + response
-- [ ] `/tarot` → tarot reading flow
-- [ ] `/link` → web auth deep link generated
-- [ ] Web auth flow → profile created
-- [ ] Instagram onboarding → context saved
-- [ ] Web → Telegram return (deep link back)
-- [ ] Manual proactive message script (dry-run and real)
+- [ ] Real-bot smoke test: text message → dating advice response
+- [ ] Real-bot smoke test: photo message → image analysis response
+- [ ] Real-bot smoke test: voice memo → transcription + dating advice + optional TTS reply
+- [ ] Real-bot smoke test: /start command → welcome message
+- [ ] Real-bot smoke test: /link command → deep-link URL for web onboarding
+- [ ] Web auth: Telegram user opens deep-link, authenticates, returns to Telegram
+- [ ] Instagram context: user can connect Instagram on web onboarding
+- [ ] Instagram context: user can skip Instagram connection
+- [ ] Instagram context appears on alpha profile after connection
+- [ ] Tarot reading: /tarot initiates a tarot card reading flow
+- [ ] Manual proactive message: `scripts/manual_proactive_checkin.py` runs successfully
+- [ ] Weave traces: at least one linked alpha user's conversation produces labeled Weave traces
+- [ ] Eval workflow: `scripts/run_weave_conversation_eval.py` can run against a synthetic dataset
 
-## v0.1.0 In-Scope Features Status
+## Policy & Docs
 
-| Feature | Status |
-|---------|--------|
-| Alpha user registry | Done |
-| Usage limits (voice + tarot) | Done |
-| Lightweight web auth | Done |
-| Telegram-web deep linking | Done |
-| Web onboarding (Instagram) | Done |
-| Bilingual EN/KO | Done |
-| Tarot deck + prompt | Done |
-| Baseline test/lint hygiene | Done |
-| Context gathering research | Done |
-| Eval trace capture schema | Done (other session) |
-| Weave conversation spans | Done (other session) |
-| Alpha labels in Weave | Done (other session) |
-| Voice memo conversation | Done (other session) |
-| Conversation eval workflow | In Progress (PR #23) |
-| Manual proactive script | In Progress (other session) |
+- [x] Security policy documented in `docs/SECURITY.md` — covers access control, data handling, third-party services, safety, media limits, operational baseline
+- [x] Eval trace policy implemented in `src/eval_trace_policy.py` — consent gate + retention (7–30 days)
+- [x] Architecture documented in `docs/ARCHITECTURE.md`
+- [x] Design brief in `docs/DESIGN_BRIEF.md`
+- [x] Setup guide in `docs/SETUP.md`
 
-## Known Out-of-Scope (Not Implemented — by Design)
+## Out-of-Scope Verification
 
-- [x] Kakaotalk linking — out of scope
-- [x] X/Twitter — out of scope
-- [x] Stripe/payment — out of scope
-- [x] Persistent product memory — out of scope
-- [x] Autonomous scheduler — out of scope
-- [x] Long-form transcript storage — out of scope
+These items are explicitly out of scope for v0.1.0. The codebase has been checked:
 
-## Alpha Risk Acceptance
+- [x] Kakaotalk — no Kakaotalk integration code exists
+- [x] X/Twitter — no Twitter integration code exists
+- [x] Payment — no payment/entitlement logic exists
+- [x] Persistent product memory — `src/memory/` exists as research prototype only, not wired into conversation flow
+- [x] Autonomous scheduler — no autonomous outbound message scheduling exists
+- [x] User-editable memory UX — no memory management UI exists
 
-- Eval workflow (HUM-1388) still in progress but not a blocking gate.
-- Manual smoke tests require real bot credentials; not runnable in CI.
+## Accepted Alpha Risks
+
+The following are accepted as known alpha risks:
+
+1. **Manual real-bot smoke test**: Requires live Telegram bot token and API keys. The mock smoke test validates all handler logic; real-bot testing is a manual step.
+2. **Weave trace verification**: Requires W&B/Weave credentials and at least one consenting alpha user. The infrastructure is in place (`src/weave_spans.py`, `src/eval_workflow.py`).
+3. **Eval workflow run**: Requires W&B/Weave credentials. The CLI entry point exists (`scripts/run_weave_conversation_eval.py`) and the eval workflow logic is tested.
+4. **Instagram context live flow**: Requires Meta developer app configuration. The web onboarding flow and alpha profile storage are implemented and tested.

@@ -10,21 +10,24 @@ In scope:
 
 - Telegram bot alpha access.
 - Text, photo, and voice-message handling.
-- Lightweight web authentication for alpha users.
-- Telegram-to-web account linking through short-lived links/tokens.
-- Web-to-Telegram return through deep links or redirects.
+- Lightweight web authentication for alpha users (HMAC-signed session tokens).
+- Telegram-to-web account linking through short-lived linking tokens (10 min).
+- Web-to-Telegram return through deep links.
 - Instagram context collection through the web onboarding flow.
+- Alpha invite code gating (`ALPHA_INVITE_CODE`).
 - LLM-backed dating advice responses.
-- Optional text-to-speech voice replies.
+- Optional text-to-speech voice replies (OpenAI TTS).
+- Tarot readings (Major Arcana deck).
 - Basic safety behavior for sensitive relationship conversations.
 - Basic structured logging for debugging and evaluation.
+- Optional Weave tracing for consenting alpha users.
 
 Out of scope for this security baseline:
 
 - Kakaotalk launch.
 - Production-grade account management.
 - Cross-channel account linking beyond Telegram.
-- Persistent product memory.
+- Persistent product memory (research prototype only in `src/memory/`).
 - X/Twitter integration.
 - Private social-media scraping or bypassing platform privacy.
 - Payments or paid tarot readings.
@@ -42,11 +45,21 @@ Required:
 - Prefer `TELEGRAM_ALLOWED_USER_IDS` for private testing.
 - If allowlist is empty, assume the bot is public and not safe for real-user testing.
 - Rotate any token that appears in terminal output, test logs, screenshots, commits, or shared documents.
+- Use a pre-shared alpha invite code (`ALPHA_INVITE_CODE`) for web auth gating.
+- Use a separate HMAC signing secret (`ALPHA_AUTH_SECRET`) for session and linking tokens.
 
 Recommended:
 
 - Use a separate Telegram bot token for development, staging, and any real-user alpha.
 - Restrict production/staging tokens to the minimum number of maintainers.
+- Rotate `ALPHA_AUTH_SECRET` and `ALPHA_INVITE_CODE` between alpha cohorts.
+
+### Alpha Auth Token Design
+
+- **Session tokens**: HMAC-SHA256 signed JSON payloads containing `user_id`, `telegram_user_id`, and `iat` (issued-at). Expire after 24 hours.
+- **Linking tokens**: Same format, shorter 10-minute expiry. Embed `telegram_user_id` and `telegram_chat_id` for Telegram→web deep-linking.
+- Both tokens are URL-safe base64-encoded with hex signature suffix.
+- Token verification uses constant-time comparison (`hmac.compare_digest`).
 
 ## Data handling
 
@@ -58,6 +71,19 @@ Important distinction:
 - **Product memory** is user-facing long-term memory used by the bot to personalize future responses.
 
 v0.1.0 may store limited evaluation traces. v0.1.0 may store a minimal alpha user profile for web auth, Telegram linking, usage limits, Weave labels, and Instagram context. v0.1.0 should not ship user-facing persistent product memory until the product-memory research is complete.
+
+### Alpha Profile Data
+
+The alpha registry (`src/alpha/registry.py`) stores per user:
+- `user_id` (internal alpha ID)
+- `telegram_user_id`, `telegram_chat_id`, `telegram_username`
+- `display_name`, `nickname`, `email` (optional, user-provided)
+- `auth_completed`, `onboarding_completed` (boolean flags)
+- `allowlisted` (boolean)
+- `usage_counters` (per-feature integer counts)
+- `instagram_context_summary` (short string, user-provided)
+
+This data is stored as JSON on disk (`tmp/alpha_registry.json` by default). It is not encrypted at rest — for alpha, treat the filesystem as the security boundary.
 
 Required:
 
@@ -73,16 +99,17 @@ Allowed for alpha evaluation and debugging:
 - Time-bounded conversation traces for consenting alpha users.
 - Voice transcripts when needed to evaluate voice behavior.
 - Prompt/model metadata needed to reproduce responses.
-- Alpha profile fields such as `user_id`, `telegram_user_id`, username, nickname, or email when intentionally collected for auth/linking or Weave analysis.
-- A short Instagram/self-summary context summary attached to the alpha profile.
+- Alpha profile fields listed above when intentionally collected.
+- Instagram/self-summary context summaries attached to alpha profiles.
 - Redacted or synthetic eval datasets derived from real scenarios.
 - Aggregated error counts and latency metrics.
 
 Retention guidance:
 
-- Raw alpha traces should be short-lived, for example 7–30 days.
+- Raw alpha traces should be short-lived, 7–30 days (configurable via `EVAL_TRACE_RETENTION_DAYS`).
 - Curated and redacted eval cases may be retained longer.
 - Raw media should not be retained unless a specific debugging need is approved.
+- Alpha profiles remain until manually deleted by the operator.
 
 Not allowed without a separate design review:
 
@@ -116,17 +143,28 @@ Required:
 
 - The assistant should avoid claiming professional authority.
 - Crisis, self-harm, abuse, coercion, or immediate-danger situations should trigger supportive language and encourage contacting trusted people, emergency services, or local crisis resources.
-- The bot should avoid manipulative advice, harassment, stalking, non-consensual monitoring, or instructions to bypass another person’s privacy.
+- The bot should avoid manipulative advice, harassment, stalking, non-consensual monitoring, or instructions to bypass another person's privacy.
 - The bot should not encourage unsafe escalation in dating or relationship conflict.
 
 ## Media limits
 
 Required:
 
-- Enforce maximum attachment size.
+- Enforce maximum attachment size (`MAX_ATTACHMENT_SIZE_MB`, default 25MB).
 - Reject unsupported media types with a friendly message.
 - Fail closed on media download, transcription, or analysis errors.
-- Prefer sending a text fallback when voice reply generation fails.
+- Prefer sending a text fallback when voice reply (TTS) generation fails.
+
+## Usage limits
+
+Alpha features have per-user monthly quotas:
+
+| Feature | Limit | Enforced by |
+|---------|-------|------------|
+| Voice messages | 10/month | `src/alpha/voice_usage.py` |
+| Tarot readings | 3/month | `src/alpha/tarot_usage.py` |
+
+Limits are bookkeeping only — no payment/entitlement logic. Counters are stored in the alpha profile JSON.
 
 ## Operational baseline
 
@@ -134,11 +172,19 @@ Before using the bot with real alpha users:
 
 - `pytest` passes.
 - `ruff check src/ tests/` passes.
-- `mypy src` passes.
+- `ty check src/` (type checker) passes.
 - Telegram smoke test passes with mock data.
-- A manual Telegram test confirms text, photo, and voice behavior.
+- A manual Telegram test confirms text, photo, voice, tarot, and /link behavior.
 - Real tokens are absent from git history, test output, screenshots, and docs.
 - `.env` is ignored by git.
+- Alpha auth secrets are set and tested.
+
+## Infrastructure security
+
+- **DNS**: Cloudflare (Terraform-managed in `infra/`)
+- **Hosting**: Vercel (frontend), Railway or Fly.io (backend)
+- **CI/CD**: GitHub Actions with secret management
+- **Terraform state**: Remote backend with encryption
 
 ## Vulnerability reporting
 

@@ -8,11 +8,13 @@
 |-------|----------|------------|
 | **DNS / Proxy / WAF** | Cloudflare (`ahnpolished.com` zone) | Terraform — `infra/modules/cloudflare-dns` |
 | **Frontend** | Vercel (`web/`) | Terraform — `infra/modules/vercel-project` |
-| **Server (API)** | Railway → `luvr-server` (FastAPI) | `railway.json` + Railway GitHub App |
-| **Server (Worker)** | Railway → `luvr-telegram` (polling bot) | `railway.json` + Railway GitHub App |
+| **Server (API)** | Railway → `luvr` service (FastAPI) | `.github/workflows/railway-deploy.yml` (Railway CLI) |
+| **Server (Worker)** | Railway → not yet provisioned (polling bot) | Known gap — `telegram-worker` service does not exist yet |
 | **Terraform State** | Google Cloud Storage (GCS backend) | Manual one-time setup |
 
-> **Why Terraform doesn't manage Railway:** The community Railway Terraform provider (`railwayapp/railway`) does not exist on the public Terraform Registry. Railway infrastructure is managed via the checked-in `railway.json` file and Railway's native GitHub integration, which auto-deploys on push to `main`.
+> **Why Terraform doesn't manage Railway:** The community Railway Terraform provider (`railwayapp/railway`) does not exist on the public Terraform Registry. Railway infrastructure is configured via the checked-in `railway.json` file, but deploys are triggered explicitly by `.github/workflows/railway-deploy.yml` using the Railway CLI — not Railway's GitHub App auto-deploy, so production can be gated behind manual approval the same way Terraform/Vercel are.
+>
+> **Note:** the project currently has a single Railway service named `luvr` (not `api`/`telegram-worker` as `railway.json`'s per-service keys assume — those keys are ignored unless service names match exactly). The `luvr` service's start command and health check are set directly via Railway service config to run the API (`uvicorn src.server:app`). The Telegram worker described below is not deployed.
 
 ## Architecture
 
@@ -37,7 +39,7 @@
 | **Staging** | `staging.luvr.ahnpolished.com` | `api-staging.luvr.ahnpolished.com` | No custom domain |
 | **Production** | `luvr.ahnpolished.com` | `api.luvr.ahnpolished.com` | No custom domain |
 
-Both environments track `main`. Staging auto-deploys on push; production requires manual approval via a GitHub Environment.
+Both environments track `main`. Staging's Railway deploy fires automatically on push to `main`; production's Railway deploy only runs via manual `workflow_dispatch`, gated behind the `production` GitHub Environment's required reviewer — same pattern as the Terraform/Vercel jobs.
 
 ## Directory Layout
 
@@ -74,6 +76,11 @@ railway.json               # Multi-service config for Railway (api + telegram-wo
    Store as `VERCEL_API_TOKEN`.
 
 5. **GitHub Environment** named `production` with a required reviewer.
+
+6. **Railway API tokens** (one per environment, created in the Railway dashboard under Project Settings → Tokens, scoped to the `staging` and `production` environments respectively):
+   - Store as GitHub Actions secrets `RAILWAY_TOKEN_STAGING` and `RAILWAY_TOKEN_PRODUCTION`.
+
+7. **Disable Railway's GitHub App auto-deploy on the `production` environment** (Railway dashboard → environment settings). Otherwise Railway will deploy production on every push to `main` regardless of the GitHub Actions approval gate. Staging can keep GitHub App auto-deploy enabled, or rely solely on the `railway-deploy.yml` workflow — either is fine since both fire on push to `main` without approval.
 
 ### Railway
 
@@ -119,8 +126,8 @@ Railway is set up manually or via their CLI:
 5. Plan output posted as PR comment
 
 ### On Merge to `main`
-1. **Staging**: `terraform apply -auto-approve`
-2. **Production**: gated behind `environment: production` → manual approval → `terraform apply -auto-approve`
+1. **Staging**: `terraform apply -auto-approve` (Terraform); `railway-deploy.yml` deploys the `luvr` service to the `staging` environment automatically
+2. **Production**: Terraform/Vercel gated behind `environment: production` → manual approval → `terraform apply -auto-approve`. Railway deploy follows the same gate — `railway-deploy.yml`'s `deploy-production` job only runs via manual `workflow_dispatch`, also gated by the `production` GitHub Environment
 
 ## DNS Sequencing
 
