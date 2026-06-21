@@ -5,16 +5,21 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from telegram.ext import ContextTypes
 
+from src.alpha.registry import AlphaUserRegistry
+from src.alpha.tarot_usage import TarotUsageGate
 from src.telegram.handlers import (
     WELCOME_MESSAGE,
+    handle_persona,
+    handle_persona_callback,
     handle_photo,
     handle_start,
+    handle_tarot,
     handle_text,
     handle_voice,
 )
 from telegram import Chat, Message, PhotoSize, Voice
-from telegram.ext import ContextTypes
 
 # ---------------------------------------------------------------------------
 # Helper: create a mock Telegram Message with reasonable defaults
@@ -613,3 +618,228 @@ async def test_handle_voice_no_response_skips_reply():
         mock_bc.send_message.assert_not_called()
         mock_bc.send_voice.assert_not_called()
         mock_tts.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# /persona command + callback
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_handle_persona_sends_keyboard():
+    """Test /persona sends an inline keyboard with all persona choices."""
+    msg = _mock_message()
+    update = _mock_update(msg)
+
+    await handle_persona(update, _mock_context())
+
+    msg.reply_text.assert_called_once()
+    _, kwargs = msg.reply_text.call_args
+    markup = kwargs["reply_markup"]
+    # 5 personas + 1 reset option
+    assert sum(len(row) for row in markup.inline_keyboard) == 6
+
+
+@pytest.mark.asyncio
+async def test_handle_persona_no_message():
+    """Test /persona with no message is a no-op."""
+    update = MagicMock()
+    update.message = None
+
+    await handle_persona(update, _mock_context())
+
+
+def _mock_callback_query(data: str, user_id: int = 999) -> MagicMock:
+    query = MagicMock()
+    query.data = data
+    query.from_user = MagicMock()
+    query.from_user.id = user_id
+    query.from_user.username = "tester"
+    query.from_user.full_name = "Test User"
+    query.answer = AsyncMock()
+    query.edit_message_text = AsyncMock()
+    query.message = MagicMock()
+    query.message.chat_id = user_id
+    return query
+
+
+@pytest.mark.asyncio
+async def test_handle_persona_callback_sets_persona():
+    """Test tapping a persona button updates the user's profile."""
+    query = _mock_callback_query("persona:coach")
+    update = MagicMock()
+    update.callback_query = query
+
+    registry = AlphaUserRegistry()
+    ctx = _mock_context()
+    ctx.bot_data["alpha_registry"] = registry
+
+    await handle_persona_callback(update, ctx)
+
+    query.answer.assert_called_once()
+    profile = registry.find_by_telegram(telegram_user_id=999)
+    assert profile is not None
+    assert profile.persona == "coach"
+    query.edit_message_text.assert_called_once()
+    assert "Coach Jordan" in query.edit_message_text.call_args[0][0]
+
+
+@pytest.mark.asyncio
+async def test_handle_persona_callback_reset_to_default():
+    """Test selecting the reset option clears persona back to default."""
+    query = _mock_callback_query("persona:default")
+    update = MagicMock()
+    update.callback_query = query
+
+    registry = AlphaUserRegistry()
+    ctx = _mock_context()
+    ctx.bot_data["alpha_registry"] = registry
+
+    await handle_persona_callback(update, ctx)
+
+    profile = registry.find_by_telegram(telegram_user_id=999)
+    assert profile.persona == "default"
+    assert "classic Luvr" in query.edit_message_text.call_args[0][0]
+
+
+@pytest.mark.asyncio
+async def test_handle_persona_callback_missing_registry():
+    """Test callback gracefully handles a missing registry."""
+    query = _mock_callback_query("persona:coach")
+    update = MagicMock()
+    update.callback_query = query
+
+    await handle_persona_callback(update, _mock_context())
+
+    query.edit_message_text.assert_called_once()
+    assert "waking up" in query.edit_message_text.call_args[0][0]
+
+
+@pytest.mark.asyncio
+async def test_handle_text_uses_selected_persona():
+    """Test that a user's selected persona is threaded into TextHandler."""
+    msg = _mock_message(text="Should I text him?")
+    update = _mock_update(msg)
+    update.effective_user = MagicMock()
+    update.effective_user.id = 999
+
+    mock_bc, mock_llm = _setup_bc_llm()
+
+    registry = AlphaUserRegistry()
+    profile = registry.get_or_create_for_telegram(telegram_user_id=999, telegram_chat_id=123456)
+    registry.update_profile(profile.user_id, persona="storyteller")
+
+    ctx = _mock_context(bridge_client=mock_bc, llm_client=mock_llm)
+    ctx.bot_data["alpha_registry"] = registry
+
+    with patch("src.handler.text_handler.TextHandler") as MockHandler:
+        mock_handler = MagicMock()
+        mock_handler._handle_internal = AsyncMock(return_value="Once upon a time...")
+        MockHandler.return_value = mock_handler
+
+        await handle_text(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
+
+        mock_handler._handle_internal.assert_called_once()
+        _, kwargs = mock_handler._handle_internal.call_args
+        assert kwargs["persona"] == "storyteller"
+
+
+@pytest.mark.asyncio
+async def test_handle_text_splits_multi_bubble_response():
+    """Test a ---BREAK----delimited response is sent as multiple bubbles."""
+    msg = _mock_message(text="Hello!")
+    update = _mock_update(msg)
+    update.effective_user = None
+
+    mock_bc, mock_llm = _setup_bc_llm()
+
+    with patch("src.handler.text_handler.TextHandler") as MockHandler:
+        mock_handler = MagicMock()
+        mock_handler._handle_internal = AsyncMock(return_value="First bubble.---BREAK---Second bubble.")
+        MockHandler.return_value = mock_handler
+
+        await handle_text(update, _mock_context(), bridge_client=mock_bc, llm_client=mock_llm)
+
+        assert mock_bc.send_message.call_count == 2
+
+
+# ---------------------------------------------------------------------------
+# /tarot command
+# ---------------------------------------------------------------------------
+
+
+def _mock_tarot_context(bridge_client, llm_client, registry, tarot_gate, bot=None) -> MagicMock:
+    ctx = _mock_context(bridge_client=bridge_client, llm_client=llm_client, bot=bot)
+    ctx.bot_data["alpha_registry"] = registry
+    ctx.bot_data["tarot_gate"] = tarot_gate
+    return ctx
+
+
+@pytest.mark.asyncio
+async def test_handle_tarot_happy_path():
+    """Test /tarot draws cards, sends images, and replies with a reading."""
+    msg = _mock_message(text="/tarot")
+    msg.from_user = MagicMock()
+    msg.from_user.id = 555
+    msg.from_user.username = "tarotuser"
+    msg.from_user.full_name = "Tarot User"
+    update = _mock_update(msg)
+
+    mock_bc, mock_llm = _setup_bc_llm()
+    mock_bc.send_photos = AsyncMock()
+    mock_llm.generate_response = AsyncMock(return_value="Your reading: things look promising.")
+
+    registry = AlphaUserRegistry()
+    tarot_gate = TarotUsageGate(registry)
+    ctx = _mock_tarot_context(mock_bc, mock_llm, registry, tarot_gate)
+
+    await handle_tarot(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
+
+    mock_bc.send_photos.assert_called_once()
+    mock_llm.generate_response.assert_called_once()
+    assert mock_bc.send_message.called
+
+    profile = registry.find_by_telegram(telegram_user_id=555)
+    assert profile.usage_counters.get("tarot_reading") == 1
+
+
+@pytest.mark.asyncio
+async def test_handle_tarot_limit_exceeded():
+    """Test /tarot refuses a reading once the monthly limit is used up."""
+    msg = _mock_message(text="/tarot")
+    msg.from_user = MagicMock()
+    msg.from_user.id = 777
+    msg.from_user.username = "maxeduser"
+    msg.from_user.full_name = "Maxed User"
+    update = _mock_update(msg)
+
+    mock_bc, mock_llm = _setup_bc_llm()
+    mock_bc.send_photos = AsyncMock()
+
+    registry = AlphaUserRegistry()
+    tarot_gate = TarotUsageGate(registry)
+    profile = registry.get_or_create_for_telegram(telegram_user_id=777, telegram_chat_id=777)
+    for _ in range(3):
+        tarot_gate.increment(profile.user_id)
+
+    ctx = _mock_tarot_context(mock_bc, mock_llm, registry, tarot_gate)
+
+    await handle_tarot(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
+
+    mock_bc.send_photos.assert_not_called()
+    msg.reply_text.assert_called_once()
+    assert "free tarot readings" in msg.reply_text.call_args[0][0]
+
+
+@pytest.mark.asyncio
+async def test_handle_tarot_missing_deps():
+    """Test /tarot with missing dependencies sends a graceful error."""
+    msg = _mock_message(text="/tarot")
+    msg.from_user = MagicMock()
+    msg.from_user.id = 1
+    update = _mock_update(msg)
+
+    await handle_tarot(update, _mock_context())
+
+    msg.reply_text.assert_called_once()
+    assert "waking up" in msg.reply_text.call_args[0][0]

@@ -6,14 +6,22 @@ extracts the relevant data, and dispatches to the existing Luvr handler pipeline
 
 from __future__ import annotations
 
-import structlog
+import asyncio
 
+import structlog
+from telegram.ext import ContextTypes
+
+from src.alpha.registry import AlphaUserRegistry
+from src.alpha.tarot_usage import TarotUsageGate
 from src.alpha_auth import build_linking_url
+from src.handler.split import split_response
 from src.llm.client import LLMClient
+from src.llm.prompts import PERSONA_DISPLAY_NAMES
+from src.llm.tarot import MAJOR_ARCANA, build_tarot_prompt
+from src.tarot.images import CARD_SLUGS, card_image_path, random_cards
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.models import InternalMessage, TelegramAttachment, TelegramMessageType
-from telegram import Update
-from telegram.ext import ContextTypes
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 
 logger = structlog.get_logger(__name__)
 
@@ -21,8 +29,15 @@ WELCOME_MESSAGE = (
     "💝 Hey there! I'm Luvr, your personal dating advice assistant.\n\n"
     "Send me a text, photo, or voice memo and I'll give you warm, honest advice "
     "on dating, relationships, and communication.\n\n"
+    "Use /persona to pick a vibe, or /tarot for a 3-card relationship reading.\n\n"
     "Just text me like you'd text a wise friend!"
 )
+
+PERSONA_CALLBACK_PREFIX = "persona:"
+PERSONA_RESET_SLUG = "default"
+
+# Card slugs are Major Arcana in canonical order (0-21), matching MAJOR_ARCANA.
+CARD_NAME_BY_SLUG: dict[str, str] = dict(zip(CARD_SLUGS, [card["name_en"] for card in MAJOR_ARCANA], strict=True))
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -66,6 +81,9 @@ async def handle_text(
         await update.message.reply_text("😅 I'm still waking up. Try again in a moment!")
         return
 
+    # --- Resolve the user's selected persona, if any ---
+    persona = _resolve_persona(update, context)
+
     # --- Build internal message ---
     msg = InternalMessage(
         chat_id=chat_id,
@@ -81,12 +99,32 @@ async def handle_text(
 
     handler = TextHandler(llm_client=lc)
     try:
-        response = await handler._handle_internal(msg)
+        response = await handler._handle_internal(msg, persona=persona)
         if response:
-            await bc.send_message(chat_guid=str(chat_id), message=response)
+            await _send_bubbles(bc, chat_id, response)
     except Exception:
         logger.exception("text_handler_error")
         await update.message.reply_text("😅 Oops, something went wrong on my end. Could you try again?")
+
+
+def _resolve_persona(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str | None:
+    """Look up the requesting user's selected persona, if a profile exists."""
+    registry: AlphaUserRegistry | None = context.bot_data.get("alpha_registry")
+    if registry is None or update.effective_user is None:
+        return None
+    profile = registry.find_by_telegram(telegram_user_id=update.effective_user.id)
+    if profile is None or profile.persona == PERSONA_RESET_SLUG:
+        return None
+    return profile.persona
+
+
+async def _send_bubbles(bc: TelegramBridgeClient, chat_id: int, response: str) -> None:
+    """Send a (possibly multi-bubble) LLM response with a natural typing delay."""
+    bubbles = split_response(response)
+    for i, bubble in enumerate(bubbles):
+        if i > 0:
+            await asyncio.sleep(settings.multi_turn_delay_seconds)
+        await bc.send_message(chat_guid=str(chat_id), message=bubble)
 
 
 async def handle_photo(
@@ -166,7 +204,7 @@ async def handle_photo(
     try:
         response = await handler._handle_internal(msg)
         if response:
-            await bc.send_message(chat_guid=str(chat_id), message=response)
+            await _send_bubbles(bc, chat_id, response)
     except Exception:
         logger.exception("photo_handler_error")
         await update.message.reply_text("I had trouble analyzing that image. Could you try again or describe it? 🧐")
@@ -250,7 +288,7 @@ async def handle_voice(
             return
 
         # Always send the text response first (so the user can read if they can't listen)
-        await bc.send_message(chat_guid=str(chat_id), message=response)
+        await _send_bubbles(bc, chat_id, response)
 
         # Send a voice reply if TTS is enabled
         if settings.tts_enabled:
@@ -296,3 +334,111 @@ async def handle_link(
         "This link expires in 10 minutes.",
         disable_web_page_preview=True,
     )
+
+
+async def handle_persona(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle the /persona command — show an inline keyboard of persona choices."""
+    if update.message is None:
+        return
+
+    buttons = [
+        [InlineKeyboardButton(label, callback_data=f"{PERSONA_CALLBACK_PREFIX}{slug}")]
+        for slug, label in PERSONA_DISPLAY_NAMES.items()
+    ]
+    reset_callback_data = f"{PERSONA_CALLBACK_PREFIX}{PERSONA_RESET_SLUG}"
+    buttons.append([InlineKeyboardButton("💝 Luvr (default)", callback_data=reset_callback_data)])
+
+    await update.message.reply_text(
+        "Pick a vibe for our chats:",
+        reply_markup=InlineKeyboardMarkup(buttons),
+    )
+
+
+async def handle_persona_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle a persona selection button tap."""
+    query = update.callback_query
+    if query is None or query.data is None or query.from_user is None:
+        return
+
+    await query.answer()
+
+    slug = query.data.removeprefix(PERSONA_CALLBACK_PREFIX)
+    registry: AlphaUserRegistry | None = context.bot_data.get("alpha_registry")
+    if registry is None:
+        await query.edit_message_text("😅 I'm still waking up. Try /persona again in a moment!")
+        return
+
+    profile = registry.get_or_create_for_telegram(
+        telegram_user_id=query.from_user.id,
+        telegram_chat_id=query.from_user.id,
+        telegram_username=query.from_user.username,
+        display_name=query.from_user.full_name,
+    )
+    registry.update_profile(profile.user_id, persona=slug)
+
+    if slug == PERSONA_RESET_SLUG:
+        await query.edit_message_text("💝 Back to classic Luvr — your usual warm, honest advice.")
+    else:
+        await query.edit_message_text(f"{PERSONA_DISPLAY_NAMES.get(slug, slug)} it is! Send me a message anytime.")
+
+
+async def handle_tarot(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    bridge_client: TelegramBridgeClient | None = None,
+    llm_client: LLMClient | None = None,
+) -> None:
+    """Handle the /tarot command — draw a 3-card relationship spread and read it."""
+    if update.message is None or update.message.from_user is None:
+        return
+
+    chat_id = update.message.chat_id
+    from_user = update.message.from_user
+    logger.info("tarot_command", chat_id=chat_id, telegram_user_id=from_user.id)
+
+    bc = bridge_client or context.bot_data.get("bridge_client")
+    lc = llm_client or context.bot_data.get("llm_client")
+    registry: AlphaUserRegistry | None = context.bot_data.get("alpha_registry")
+    tarot_gate: TarotUsageGate | None = context.bot_data.get("tarot_gate")
+    if bc is None or lc is None or registry is None or tarot_gate is None:
+        logger.error("tarot_dependencies_missing")
+        await update.message.reply_text("😅 I'm still waking up. Try again in a moment!")
+        return
+
+    profile = registry.get_or_create_for_telegram(
+        telegram_user_id=from_user.id,
+        telegram_chat_id=chat_id,
+        telegram_username=from_user.username,
+        display_name=from_user.full_name,
+    )
+
+    limit_check = tarot_gate.check(profile.user_id)
+    if not limit_check.allowed:
+        await update.message.reply_text(
+            "🔮 You've used all your free tarot readings for this month "
+            f"({limit_check.used}/{limit_check.limit}). New readings unlock next month!"
+        )
+        return
+
+    bc.configure(chat_id=chat_id, reply_method=update.message.reply_text, bot=context.bot)
+
+    try:
+        slugs = random_cards(3)
+        card_names = [CARD_NAME_BY_SLUG[slug] for slug in slugs]
+        await update.message.reply_text("🔮 Shuffling the deck...")
+        await bc.send_photos(
+            [card_image_path(slug) for slug in slugs],
+            caption=" • ".join(card_names),
+        )
+
+        reading_prompt = build_tarot_prompt(card_names)
+        reading = await lc.generate_response(
+            user_message="Give me my 3-card relationship tarot reading.",
+            system_prompt=reading_prompt,
+        )
+        await _send_bubbles(bc, chat_id, reading)
+
+        tarot_gate.increment(profile.user_id)
+    except Exception:
+        logger.exception("tarot_handler_error")
+        await update.message.reply_text("I had trouble pulling your cards. Could you try /tarot again? 🔮")

@@ -64,6 +64,10 @@ class Settings(BaseSettings):  # type: ignore[misc]  # pydantic-settings stub qu
     opencode_provider_id: str = "deepseek"
     llm_model: str = "gpt-4o-mini"
 
+    # --- Multi-Turn Messaging ---
+    multi_turn_delay_seconds: float = 1.5
+    multi_turn_delimiter: str = "---BREAK---"
+
     # --- Media ---
     max_attachment_size_mb: int = 25
     eval_trace_retention_days: int = 14
