@@ -207,6 +207,7 @@ async def _handle_onboarding_setup(
     telegram_user_id: int,
 ) -> None:
     """Send the deep-link URL and mark session as 'link_sent'."""
+    # In DMs chat_id == user_id. Use user_id as the chat key for simplicity.
     key = _session_key(telegram_user_id, telegram_user_id)
     _onboarding_sessions[key] = "link_sent"
 
