@@ -1,0 +1,134 @@
+.reveal {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.reveal__spread {
+  flex: none;
+  padding: 4px 0 6px;
+}
+
+.reveal__orb-area {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 0;
+}
+
+.reveal__transcript {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);
+}
+
+.reveal__transcript-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 10px 24px 4px;
+}
+
+.reveal__dock {
+  flex: none;
+  padding: 10px 22px 20px;
+  border-top: 1px solid rgba(247, 239, 227, 0.07);
+  background: linear-gradient(0deg, rgba(10, 7, 6, 0.55), transparent);
+}
+
+.reveal__dock-label {
+  text-align: center;
+  font-family: var(--font-reader, 'Spectral', serif);
+  font-style: italic;
+  font-size: 15px;
+  color: #D8C9B8;
+  margin-bottom: 10px;
+}
+
+.reveal__chips-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 7px;
+  justify-content: center;
+}
+
+.reveal__input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.reveal__input {
+  flex: 1;
+  resize: none;
+  background: rgba(10, 7, 6, 0.5);
+  border: 1px solid rgba(247, 239, 227, 0.16);
+  color: #F2E9DC;
+  border-radius: 14px;
+  padding: 11px 13px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  min-height: 46px;
+}
+
+.reveal__input:focus {
+  border-color: var(--orb-accent, #FF6B61);
+}
+
+.reveal__send-btn {
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: none;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--orb-accent, #FF6B61);
+  color: #fff;
+}
+
+.reveal__send-btn:disabled {
+  background: rgba(247, 239, 227, 0.1);
+  color: #7A6E64;
+  cursor: not-allowed;
+}
+
+.reveal__ended-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: center;
+}
+
+.reveal__action-btn {
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reveal__action-btn--primary {
+  background: var(--orb-accent, #FF6B61);
+  color: #fff;
+  border: none;
+}
+
+.reveal__action-btn--secondary {
+  background: rgba(247, 239, 227, 0.06);
+  color: #E8DCCB;
+  border: 1px solid rgba(247, 239, 227, 0.18);
+}

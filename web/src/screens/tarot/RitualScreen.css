@@ -1,0 +1,137 @@
+.ritual {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 26px 24px;
+  overflow-y: auto;
+}
+
+.ritual__prompt {
+  flex: none;
+  text-align: center;
+  margin-top: 6px;
+  min-height: 54px;
+}
+
+.ritual__prompt-text {
+  font-family: var(--font-reader, 'Spectral', serif);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.35;
+  color: #F2E9DC;
+  max-width: 24ch;
+  margin: 0 auto;
+}
+
+.ritual__orb-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 200px;
+}
+
+.ritual__mirror {
+  flex: none;
+  text-align: center;
+  min-height: 64px;
+  padding: 0 6px;
+  white-space: pre-wrap;
+  font-family: var(--font-reader, 'Spectral', serif);
+  font-size: 17px;
+  line-height: 1.5;
+  color: #E8DCCB;
+}
+
+.ritual__input-area {
+  flex: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ritual__chips {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ritual__textarea-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.ritual__textarea {
+  flex: 1;
+  resize: none;
+  background: rgba(10, 7, 6, 0.5);
+  border: 1px solid rgba(247, 239, 227, 0.16);
+  color: #F2E9DC;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  outline: none;
+  min-height: 48px;
+}
+
+.ritual__textarea:focus {
+  border-color: var(--orb-accent, #FF6B61);
+}
+
+.ritual__send-btn {
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: none;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--orb-accent, #FF6B61);
+  color: #fff;
+}
+
+.ritual__send-btn:disabled {
+  background: rgba(247, 239, 227, 0.1);
+  color: #7A6E64;
+  cursor: not-allowed;
+}
+
+.ritual__mic-hint {
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #6E635A;
+  letter-spacing: 0.04em;
+}
+
+.ritual__draw-btn {
+  flex: none;
+  margin-top: 6px;
+  padding: 14px 34px;
+  border-radius: 999px;
+  border: none;
+  background: var(--orb-gold, #C9A24B);
+  color: #1A1206;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 30px -10px color-mix(in srgb, var(--orb-gold, #C9A24B) 70%, transparent);
+  animation: tx-pop 0.5s ease both;
+}
+
+@keyframes tx-pop {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  60% { transform: translateY(0) scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}

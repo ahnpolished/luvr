@@ -3,6 +3,7 @@ import { LandingScreen } from './screens/LandingScreen'
 import { AuthScreen } from './screens/AuthScreen'
 import { InstagramContextScreen } from './screens/InstagramContextScreen'
 import { TelegramHandoffScreen } from './screens/TelegramHandoffScreen'
+import { TarotScreen } from './screens/tarot'
 import { OnboardingProvider } from './state/OnboardingProvider'
 import { useOnboarding } from './state/onboarding-context'
 
@@ -68,6 +69,7 @@ function App() {
           <Route path="/auth" element={<AuthRoute />} />
           <Route path="/context" element={<ContextRoute />} />
           <Route path="/telegram" element={<TelegramRoute />} />
+          <Route path="/tarot" element={<TarotScreen />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </OnboardingProvider>
