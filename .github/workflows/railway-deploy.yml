@@ -22,8 +22,13 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy to Railway (Staging)
+      - name: Deploy API server (Staging)
         run: railway up --service luvr --environment staging -y
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy Telegram worker (Staging)
+        run: railway up --service telegram-worker-staging --environment staging -y
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -40,7 +45,12 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy to Railway (Production)
+      - name: Deploy API server (Production)
         run: railway up --service luvr --environment production -y
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy Telegram worker (Production)
+        run: railway up --service telegram-worker --environment production -y
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
