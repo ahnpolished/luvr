@@ -21,6 +21,9 @@ from src.bridge.client import BlueBubblesClient
 from src.config import settings
 from src.handler.pipeline import MessagePipeline
 from src.logging_config import setup_logging
+from src.tarot.engine import advance_session as advance_tarot_session
+from src.tarot.engine import create_session as create_tarot_session
+from src.tarot.engine import get_session as get_tarot_session
 
 logger = structlog.get_logger(__name__)
 
@@ -214,3 +217,59 @@ async def auth_alpha_onboarding(request: Request) -> JSONResponse:
     )
 
     return JSONResponse(updated.model_dump(mode="json"))
+
+
+# ------------------------------------------------------------------
+# Tarot mini-app endpoints
+# ------------------------------------------------------------------
+
+
+@app.post("/api/tarot/session")
+async def tarot_create_session(request: Request) -> JSONResponse:
+    """Create a new tarot reading session."""
+    session = create_tarot_session()
+    return JSONResponse(
+        {
+            "session_id": session.id,
+            "phase": session.phase,
+        }
+    )
+
+
+@app.post("/api/tarot/session/{session_id}/action")
+async def tarot_advance_session(session_id: str, request: Request) -> JSONResponse:
+    """Advance a tarot session with a user action."""
+    session = get_tarot_session(session_id)
+    if not session:
+        return JSONResponse({"detail": "session not found or expired"}, status_code=404)
+
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"detail": "invalid json"}, status_code=400)
+
+    result = await advance_tarot_session(session, body)
+
+    if "error" in result:
+        return JSONResponse({"detail": result["error"]}, status_code=400)
+
+    return JSONResponse(result)
+
+
+@app.get("/api/tarot/session/{session_id}")
+async def tarot_get_session(session_id: str) -> JSONResponse:
+    """Get current tarot session state (for resume)."""
+    from src.tarot.engine import _serialize_cards, _serialize_messages
+
+    session = get_tarot_session(session_id)
+    if not session:
+        return JSONResponse({"detail": "session not found or expired"}, status_code=404)
+
+    return JSONResponse(
+        {
+            "session_id": session.id,
+            "phase": session.phase,
+            "cards": _serialize_cards(session.drawn_cards),
+            "messages": _serialize_messages(session.dialogue),
+        }
+    )
