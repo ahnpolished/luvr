@@ -5,7 +5,6 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from telegram.ext import ContextTypes
 
 from src.telegram.handlers import (
     WELCOME_MESSAGE,
@@ -15,6 +14,7 @@ from src.telegram.handlers import (
     handle_voice,
 )
 from telegram import Chat, Message, PhotoSize, Voice
+from telegram.ext import ContextTypes
 
 # ---------------------------------------------------------------------------
 # Helper: create a mock Telegram Message with reasonable defaults
