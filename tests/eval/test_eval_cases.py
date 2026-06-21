@@ -939,11 +939,11 @@ def test_system_prompt_present() -> None:
 
     # Must contain all core personality pillars
     required_traits = [
-        "empathetic",
+        "warm",
         "honest",
         "non-judgmental",
-        "practical",
         "safety",
+        "babe",
     ]
     for trait in required_traits:
         assert trait in DATING_ADVISOR_SYSTEM_PROMPT.lower(), f"Missing trait: {trait}"
@@ -972,8 +972,8 @@ def test_system_prompt_length_reasonable() -> None:
     from src.llm.prompts import DATING_ADVISOR_SYSTEM_PROMPT
 
     length = len(DATING_ADVISOR_SYSTEM_PROMPT)
-    # Should be under ~2000 chars to stay token-efficient
-    assert length < 2500, f"System prompt too long: {length} chars"
+    # Should be under ~4500 chars (Luna's full prompt with multi-bubble format)
+    assert length < 4500, f"System prompt too long: {length} chars"
 
 
 @pytest.mark.eval
@@ -1084,6 +1084,6 @@ def test_full_eval_suite() -> None:
 
     # All test cases should pass
     results = eval_result.test_results
-    assert all(
-        r.success for r in results
-    ), f"Some eval cases failed: {[(r.name, r.error) for r in results if not r.success]}"
+    assert all(r.success for r in results), (
+        f"Some eval cases failed: {[(r.name, r.error) for r in results if not r.success]}"
+    )

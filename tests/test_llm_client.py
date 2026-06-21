@@ -66,12 +66,15 @@ def test_create_client_unsupported_provider():
 
 
 def test_system_prompt_contains_key_elements():
-    """Test that the system prompt includes all required personality traits."""
-    assert "empathetic" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
+    """Test that the system prompt (Luna) includes all required personality traits."""
+    # Luna's core traits
+    assert "warm" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
     assert "honest" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
     assert "non-judgmental" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
-    assert "practical" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
     assert "safety" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
+    assert "babe" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
+    assert "imessage" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
+    assert "luna" in DATING_ADVISOR_SYSTEM_PROMPT.lower()
 
 
 def test_photo_analysis_prompt():
