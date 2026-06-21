@@ -1,14 +1,13 @@
 # --------------------------------------------------------------------
-# R2 backend (S3-compatible) for Terraform state
+# GCS backend for Terraform state
 #
-# Configured per official Cloudflare guide:
-#   https://developers.cloudflare.com/terraform/advanced-topics/remote-backend/
-#
-# Secrets are passed via -backend-config in CI (never committed).
+# Auth via GOOGLE_BACKEND_CREDENTIALS env var in CI.
+# Locally: gcloud auth application-default login
 # --------------------------------------------------------------------
 
 terraform {
-  backend "s3" {
-    key = "staging/terraform.tfstate"
+  backend "gcs" {
+    bucket = "luvr-tf-state"
+    prefix = "staging"
   }
 }

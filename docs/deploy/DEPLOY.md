@@ -10,7 +10,7 @@
 | **Frontend** | Vercel (`web/`) | Terraform — `infra/modules/vercel-project` |
 | **Server (API)** | Railway → `luvr-server` (FastAPI) | `railway.json` + Railway GitHub App |
 | **Server (Worker)** | Railway → `luvr-telegram` (polling bot) | `railway.json` + Railway GitHub App |
-| **Terraform State** | Cloudflare R2 (S3-compatible backend) | Manual one-time setup |
+| **Terraform State** | Google Cloud Storage (GCS backend) | Manual one-time setup |
 
 > **Why Terraform doesn't manage Railway:** The community Railway Terraform provider (`railwayapp/railway`) does not exist on the public Terraform Registry. Railway infrastructure is managed via the checked-in `railway.json` file and Railway's native GitHub integration, which auto-deploys on push to `main`.
 
@@ -47,7 +47,7 @@ infra/
     cloudflare-dns/        # Zone data source + DNS records + zone settings + WAF
     vercel-project/        # vercel_project + domain + env vars
   envs/
-    staging/               # Backend "s3" (R2), provider blocks, module calls
+    staging/               # Backend "gcs", provider blocks, module calls
     production/            # Same structure, production values
 .github/workflows/
   terraform-plan.yml       # PR touching infra/**: fmt check, validate, plan, comment
@@ -59,19 +59,13 @@ railway.json               # Multi-service config for Railway (api + telegram-wo
 
 ### Terraform
 
-1. **Cloudflare R2 bucket** for Terraform state:
+1. **GCS bucket** for Terraform state:
    ```bash
-   wrangler r2 bucket create luvr-tf
+   gcloud storage buckets create gs://luvr-tf-state --location=us-central1
    ```
-   Or create via Cloudflare Dashboard → R2 → Create bucket.
-   See official guide: https://developers.cloudflare.com/terraform/advanced-topics/remote-backend/
 
-2. **R2 S3-compatible API token** with Object Read & Write.
-   Store in GitHub Actions secrets:
-   - `TF_STATE_BUCKET` — bucket name
-   - `R2_ENDPOINT` — `https://<account>.r2.cloudflarestorage.com`
-   - `R2_ACCESS_KEY` — R2 access key ID
-   - `R2_SECRET_KEY` — R2 secret access key
+2. **GCP Service Account** with `Storage Object Admin` on the bucket.
+   Download the JSON key and store as GitHub Actions secret `GCP_SA_KEY`.
 
 3. **Cloudflare API token** (Zone:DNS:Edit + Zone:Settings:Edit + Zone:WAF:Edit).
    Store as `CLOUDFLARE_API_TOKEN`.
@@ -119,9 +113,9 @@ Railway is set up manually or via their CLI:
 
 ### On PR (touching `infra/**`)
 1. `terraform fmt -check -recursive infra/`
-2. `terraform init -backend=false` (if R2 secrets not set) or full init
+2. `terraform init`
 3. `terraform validate`
-4. `terraform plan` (if secrets available)
+4. `terraform plan`
 5. Plan output posted as PR comment
 
 ### On Merge to `main`

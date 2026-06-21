@@ -26,62 +26,39 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_vercel_api_token: ${{ secrets.VERCEL_API_TOKEN }}
-      VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "~> 1.9"
 
-      - name: Check secrets availability
-        id: secrets
-        run: |
-          if [ -n "${{ secrets.TF_STATE_BUCKET }}" ]; then
-            echo "available=true" >> $GITHUB_OUTPUT
-          else
-            echo "available=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Terraform Format Check
         run: terraform fmt -check -recursive ../../
 
-      - name: Terraform Init (no backend — validation only)
-        if: steps.secrets.outputs.available == 'false'
-        run: terraform init -backend=false
+      - name: Terraform Init
+        run: terraform init
 
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Terraform Init (R2 backend)
-        if: steps.secrets.outputs.available == 'true'
-        run: |
-          terraform init \
-            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-            -backend-config="endpoint=${{ secrets.R2_ENDPOINT }}" \
-            -backend-config="access_key=${{ secrets.R2_ACCESS_KEY }}" \
-            -backend-config="secret_key=${{ secrets.R2_SECRET_KEY }}" \
-            -backend-config="region=auto" \
-            -backend-config="use_path_style=true" \
-            -backend-config="skip_credentials_validation=true" \
-            -backend-config="skip_region_validation=true" \
-            -backend-config="skip_metadata_api_check=true" \
-            -backend-config="skip_requesting_account_id=true" \
-            -backend-config="skip_s3_checksum=true"
-
       - name: Terraform Plan
         id: plan
-        if: steps.secrets.outputs.available == 'true'
         run: |
           terraform plan -no-color -out=tfplan
           echo 'PLAN<<EOF' >> $GITHUB_ENV
           terraform show -no-color tfplan >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
-      - name: Comment PR (plan available)
-        if: steps.secrets.outputs.available == 'true' && github.event_name == 'pull_request'
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
@@ -96,27 +73,6 @@ jobs:
             </details>
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            });
-
-      - name: Comment PR (no backend — fmt + validate only)
-        if: steps.secrets.outputs.available == 'false' && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const output = `### Terraform: \`${{ matrix.environment }}\`
-
-            ✅ \`terraform fmt -check\` passed
-            ✅ \`terraform validate\` passed
-
-            ⚠️ **Plan skipped** — R2 backend credentials not yet configured.
-            Add \`TF_STATE_BUCKET\`, \`R2_ENDPOINT\`, \`R2_ACCESS_KEY\`, and
-            \`R2_SECRET_KEY\` as GitHub Actions secrets to enable full plan output.`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
