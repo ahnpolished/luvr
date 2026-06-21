@@ -44,8 +44,9 @@ resource "cloudflare_zone_settings_override" "this" {
 
   settings {
     ssl = var.ssl_mode
-    # Require modern TLS
     min_tls_version = "1.2"
+    # Explicitly set read-only settings to avoid drift errors
+    mirage = "off"
   }
 }
 
@@ -63,7 +64,7 @@ resource "cloudflare_ruleset" "rate_limit" {
   rules {
     action      = "block"
     description = "Rate-limit auth endpoints"
-    expression  = "(http.request.uri.path matches \"^/auth/alpha/\")"
+    expression  = "(http.request.uri.path contains \"/auth/alpha/\")"
     enabled     = true
 
     ratelimit {
@@ -71,7 +72,7 @@ resource "cloudflare_ruleset" "rate_limit" {
       period              = 10
       requests_per_period = var.waf_rate_limit_threshold
       mitigation_timeout  = 30
-      counting_expression = "(http.request.uri.path matches \"^/auth/alpha/\")"
+      counting_expression = "(http.request.uri.path contains \"/auth/alpha/\")"
     }
   }
 }
