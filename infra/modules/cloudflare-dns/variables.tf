@@ -29,3 +29,15 @@ variable "proxied" {
   type        = bool
   default     = false
 }
+
+variable "api_verify_txt_name" {
+  description = "DNS name for the Railway domain verification TXT record (e.g., _railway-verify.api)"
+  type        = string
+  default     = ""
+}
+
+variable "api_verify_txt_value" {
+  description = "TXT value for the Railway domain verification record"
+  type        = string
+  default     = ""
+}

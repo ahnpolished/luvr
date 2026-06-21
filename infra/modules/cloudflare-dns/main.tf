@@ -38,3 +38,13 @@ resource "cloudflare_record" "api" {
   proxied = var.proxied
   comment = "Luvr API (Railway)"
 }
+
+# ---- DNS: Railway domain verification TXT ----
+
+resource "cloudflare_record" "api_verify_txt" {
+  zone_id = data.cloudflare_zone.this.id
+  name    = var.api_verify_txt_name
+  type    = "TXT"
+  value   = var.api_verify_txt_value
+  comment = "Railway custom domain verification"
+}
