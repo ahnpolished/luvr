@@ -38,6 +38,9 @@ resource "cloudflare_record" "api" {
 }
 
 # ---- Zone SSL / TLS ----
+# All settings must be explicitly listed — cloudflare_zone_settings_override
+# reads the full zone settings payload and fails on read-only settings
+# that are returned by the API but not declared in the block.
 
 resource "cloudflare_zone_settings_override" "this" {
   zone_id = data.cloudflare_zone.this.id
@@ -45,6 +48,20 @@ resource "cloudflare_zone_settings_override" "this" {
   settings {
     ssl             = var.ssl_mode
     min_tls_version = "1.2"
+
+    # Read-only settings (required to prevent drift errors on non-Enterprise plans)
+    advanced_ddos               = "on"
+    http2                       = "on"
+    long_lived_grpc             = "off"
+    mirage                      = "off"
+    origin_error_page_pass_thru = "off"
+    polish                      = "off"
+    prefetch_preload            = "off"
+    proxy_read_timeout          = "100"
+    response_buffering          = "off"
+    sort_query_string_for_cache = "off"
+    true_client_ip_header       = "off"
+    webp                        = "off"
   }
 }
 
