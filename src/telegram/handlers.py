@@ -7,13 +7,13 @@ extracts the relevant data, and dispatches to the existing Luvr handler pipeline
 from __future__ import annotations
 
 import structlog
+from telegram.ext import ContextTypes
 
 from src.alpha_auth import build_linking_url
 from src.llm.client import LLMClient
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.models import InternalMessage, TelegramAttachment, TelegramMessageType
 from telegram import Update
-from telegram.ext import ContextTypes
 
 logger = structlog.get_logger(__name__)
 
