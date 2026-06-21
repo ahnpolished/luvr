@@ -45,6 +45,7 @@ resource "cloudflare_record" "api_verify_txt" {
   zone_id = data.cloudflare_zone.this.id
   name    = var.api_verify_txt_name
   type    = "TXT"
-  value   = var.api_verify_txt_value
+  # Content must be quoted per RFC 1035 / Cloudflare API requirement
+  value   = "\"${var.api_verify_txt_value}\""
   comment = "Railway custom domain verification"
 }
