@@ -19,23 +19,17 @@ hooks = [
     { id = "ruff-format" },
 ]
 
-# mypy — static type checker (src/ only; scripts are utilities)
+# ty — extremely fast Python type checker (replaces mypy)
 [[repos]]
-repo = "https://github.com/pre-commit/mirrors-mypy"
-rev = "v1.13.0"
+repo = "local"
 hooks = [
     {
-        id = "mypy",
-        args = [
-            "--strict",
-            "--ignore-missing-imports",
-            "--explicit-package-bases",
-        ],
-        files = "^src/",
-        additional_dependencies = [
-            "pydantic>=2.10.0",
-            "structlog>=24.4.0",
-        ],
+        id = "ty-check",
+        name = "ty",
+        language = "system",
+        entry = "uv",
+        args = ["run", "ty", "check", "src/"],
+        pass_filenames = false,
     },
 ]
 

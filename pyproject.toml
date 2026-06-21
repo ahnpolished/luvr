@@ -43,7 +43,7 @@ dev = [
     "pytest-mock>=3.14.0",
     "pytest-httpx>=0.30.0",
     "ruff>=0.8.0",
-    "mypy>=1.13.0",
+    "ty>=0.0.51",
     "deepeval>=4.0.0",
     "Pillow>=10.0.0",
 ]
@@ -79,12 +79,9 @@ ignore = ["SIM105"]
 "scripts/**/*.py" = ["N806"]
 "src/llm/prompts.py" = ["E501"]
 
-[tool.mypy]
-python_version = "3.12"
-strict = true
-warn_return_any = true
-warn_unused_configs = true
+[tool.ty.environment]
+python-version = "3.12"
 
-[[tool.mypy.overrides]]
-module = "opencode_ai"
-ignore_missing_imports = true
+[tool.ty.rules]
+# Skip optional dependency with no stubs
+unresolved-import = "ignore"

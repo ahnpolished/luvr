@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 import structlog
 
 from src.bridge.client import BlueBubblesClient
@@ -89,7 +91,7 @@ class MessagePipeline:
             if "data" in raw_payload:
                 inner = raw_payload["data"]
                 if isinstance(inner, dict):
-                    raw_payload = inner
+                    raw_payload = cast(dict[str, object], inner)
 
             # Model validation — catch Pydantic errors separately so we can log
             # the offending fields, then bail out gracefully.
