@@ -17,7 +17,7 @@ from src.alpha_auth import build_linking_url
 from src.handler.split import split_response
 from src.llm.client import LLMClient
 from src.llm.prompts import PERSONA_DISPLAY_NAMES
-from src.llm.tarot import MAJOR_ARCANA, build_tarot_prompt
+from src.llm.tarot import TAROT_DECK, build_tarot_prompt
 from src.tarot.images import CARD_SLUGS, card_image_path, random_cards
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.models import InternalMessage, TelegramAttachment, TelegramMessageType
@@ -36,8 +36,8 @@ WELCOME_MESSAGE = (
 PERSONA_CALLBACK_PREFIX = "persona:"
 PERSONA_RESET_SLUG = "default"
 
-# Card slugs are Major Arcana in canonical order (0-21), matching MAJOR_ARCANA.
-CARD_NAME_BY_SLUG: dict[str, str] = dict(zip(CARD_SLUGS, [card["name_en"] for card in MAJOR_ARCANA], strict=True))
+# Card slugs match full 78-card deck (TAROT_DECK).
+CARD_NAME_BY_SLUG: dict[str, str] = dict(zip(CARD_SLUGS, [card["name_en"] for card in TAROT_DECK], strict=True))
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

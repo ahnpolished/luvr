@@ -10,7 +10,7 @@ from pathlib import Path
 _ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "assets" / "tarot"
 
 # Card slugs (matching the tarot flow contract)
-CARD_SLUGS: list[str] = [
+MAJOR_ARCANA_SLUGS: list[str] = [
     "fool",
     "magician",
     "high_priestess",
@@ -35,16 +35,23 @@ CARD_SLUGS: list[str] = [
     "world",
 ]
 
+_MINOR_ARCANA_SUITS: list[str] = ["cups", "pents", "swords", "wands"]
+_MINOR_ARCANA_SLUGS: list[str] = [f"{suit}_{i:02d}" for suit in _MINOR_ARCANA_SUITS for i in range(1, 15)]
+
+CARD_SLUGS: list[str] = MAJOR_ARCANA_SLUGS + _MINOR_ARCANA_SLUGS
+
+# Card slugs are ordered: 22 Major Arcana (0–21) then 56 Minor Arcana (cups_01–wands_14).
+
 CARD_BACK_SLUG = "card_back"
 
 
 def card_image_path(slug: str) -> Path:
-    """Return the absolute path to a card image."""
-    return _ASSETS_DIR / f"{slug}.png"
+    """Return the absolute path to a card image (WebP format for cards)."""
+    return _ASSETS_DIR / f"{slug}.webp"
 
 
 def card_back_path() -> Path:
-    """Return the absolute path to the card-back image."""
+    """Return the absolute path to the card-back image (PNG)."""
     return _ASSETS_DIR / "card_back.png"
 
 

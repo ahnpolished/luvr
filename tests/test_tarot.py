@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import pytest
 
-from src.llm.tarot import MAJOR_ARCANA, build_tarot_prompt
+from src.llm.tarot import MAJOR_ARCANA, TAROT_DECK, build_tarot_prompt
 
 ENGLISH_NAMES = [c["name_en"] for c in MAJOR_ARCANA]
+
+
+def test_tarot_deck_has_78_cards():
+    assert len(TAROT_DECK) == 78
+    assert len(set(c["id"] for c in TAROT_DECK)) == 78  # unique ids
 
 
 def test_major_arcana_has_22_cards():

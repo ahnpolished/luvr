@@ -1,10 +1,70 @@
-"""Minimal v0.1.0 tarot card deck and prompt builder.
+"""Tarot card deck and prompt builder.
 
-Provides 22 Major Arcana cards with English and Korean names plus a
-language-aware prompt template for the LLM reading.
+Provides all 78 cards (22 Major Arcana + 56 Minor Arcana) with English
+and Korean names plus a language-aware prompt template for the LLM reading.
 """
 
 from __future__ import annotations
+
+# ── Korean suit & court name helpers ──────────────────────────────────────────
+
+_KO_SUITS: dict[str, str] = {
+    "cups": "컵",
+    "pents": "펜타클",
+    "swords": "검",
+    "wands": "완드",
+}
+
+_KO_RANKS: dict[int, str] = {
+    1: "에이스",
+    11: "시종",
+    12: "기사",
+    13: "여왕",
+    14: "왕",
+}
+
+
+def _minor_arcana_name(suit: str, number: int) -> tuple[str, str, str]:
+    """Return (id, name_en, name_ko) for a Minor Arcana card."""
+    slug = f"{suit}_{number:02d}"
+    suit_en = suit.capitalize()
+    if number == 1:
+        rank_en = "Ace"
+        rank_ko = _KO_RANKS[1]
+    elif number <= 10:
+        rank_en = [
+            "Two",
+            "Three",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine",
+            "Ten",
+        ][number - 2]
+        rank_ko = str(number)
+    elif number == 11:
+        rank_en = "Page"
+        rank_ko = _KO_RANKS[11]
+    elif number == 12:
+        rank_en = "Knight"
+        rank_ko = _KO_RANKS[12]
+    elif number == 13:
+        rank_en = "Queen"
+        rank_ko = _KO_RANKS[13]
+    elif number == 14:
+        rank_en = "King"
+        rank_ko = _KO_RANKS[14]
+    else:
+        raise ValueError(f"Invalid rank: {number}")
+
+    name_en = f"{rank_en} of {suit_en}"
+    name_ko = f"{_KO_SUITS[suit]} {rank_ko}"
+    return slug, name_en, name_ko
+
+
+# ── Major Arcana ─────────────────────────────────────────────────────────────
 
 MAJOR_ARCANA: list[dict[str, str]] = [
     {"id": "0", "name_en": "The Fool", "name_ko": "바보 (The Fool)"},
@@ -30,6 +90,16 @@ MAJOR_ARCANA: list[dict[str, str]] = [
     {"id": "20", "name_en": "Judgement", "name_ko": "심판 (Judgement)"},
     {"id": "21", "name_en": "The World", "name_ko": "세계 (The World)"},
 ]
+
+# ── Full 78-card deck (Major + Minor Arcana) ─────────────────────────────────
+
+_MINOR_ARCANA: list[dict[str, str]] = []
+for _suit in ["cups", "pents", "swords", "wands"]:
+    for _number in range(1, 15):
+        _slug, _name_en, _name_ko = _minor_arcana_name(_suit, _number)
+        _MINOR_ARCANA.append({"id": _slug, "name_en": _name_en, "name_ko": _name_ko})
+
+TAROT_DECK: list[dict[str, str]] = MAJOR_ARCANA + _MINOR_ARCANA
 
 
 def build_tarot_prompt(selected_cards: list[str], *, user_language: str = "en") -> str:
