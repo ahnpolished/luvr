@@ -3,11 +3,14 @@
 #
 # Creates:
 #   - CNAME records for frontend (→ Vercel) and API (→ Railway)
-#   - Zone-level SSL/TLS settings
 #
 # NOTE: DNS records must first be created with proxied = false so
 # Railway/Vercel can verify the domain and issue their own TLS cert.
 # Only flip to proxied = true afterward, then set ssl_mode = "strict".
+#
+# Zone SSL/TLS settings (ssl_mode, min_tls_version) are configured
+# manually in the Cloudflare dashboard — cloudflare_zone_settings_override
+# is incompatible with non-Enterprise plans due to read-only setting drift.
 # --------------------------------------------------------------------
 
 data "cloudflare_zone" "this" {
@@ -34,19 +37,4 @@ resource "cloudflare_record" "api" {
   value   = var.railway_cname_target
   proxied = var.proxied
   comment = "Luvr API (Railway)"
-}
-
-# ---- Zone SSL / TLS ----
-
-resource "cloudflare_zone_settings_override" "this" {
-  zone_id = data.cloudflare_zone.this.id
-
-  settings {
-    ssl             = var.ssl_mode
-    min_tls_version = "1.2"
-  }
-
-  lifecycle {
-    ignore_changes = [settings]
-  }
 }

@@ -96,7 +96,6 @@ module "cloudflare" {
   api_domain           = var.api_domain
   railway_cname_target = var.railway_cname_target
   proxied              = false # two-step: flip to true after cert provisioning
-  ssl_mode             = "full"
 }
 
 # --------------------------------------------------------------------

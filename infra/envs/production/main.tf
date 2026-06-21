@@ -86,14 +86,11 @@ variable "railway_cname_target" {
 module "cloudflare" {
   source = "../../modules/cloudflare-dns"
 
-  zone_name                = var.zone_name
-  frontend_domain          = var.frontend_domain
-  api_domain               = var.api_domain
-  railway_cname_target     = var.railway_cname_target
-  proxied                  = false # two-step: flip to true after cert provisioning
-  ssl_mode                 = "full"
-  enable_rate_limit        = true
-  waf_rate_limit_threshold = 20 # stricter for production
+  zone_name            = var.zone_name
+  frontend_domain      = var.frontend_domain
+  api_domain           = var.api_domain
+  railway_cname_target = var.railway_cname_target
+  proxied              = false # two-step: flip to true after cert provisioning
 }
 
 # --------------------------------------------------------------------
