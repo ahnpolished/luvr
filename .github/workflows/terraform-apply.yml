@@ -40,11 +40,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Remove stale resources from state
-        run: |
-          terraform state rm 'module.cloudflare.cloudflare_zone_settings_override.this' 2>/dev/null || true
-          terraform state rm 'module.cloudflare.cloudflare_ruleset.rate_limit[0]' 2>/dev/null || true
-
       - name: Terraform Apply (Staging)
         run: terraform apply -auto-approve
 
@@ -79,11 +74,6 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-
-      - name: Remove stale resources from state
-        run: |
-          terraform state rm 'module.cloudflare.cloudflare_zone_settings_override.this' 2>/dev/null || true
-          terraform state rm 'module.cloudflare.cloudflare_ruleset.rate_limit[0]' 2>/dev/null || true
 
       - name: Terraform Apply (Production)
         run: terraform apply -auto-approve
