@@ -92,7 +92,7 @@ def _test_bridge_client():
 async def _test_handler_start():
     """Test /start handler."""
     print("  👋 Testing /start handler...")
-    from src.telegram.handlers import handle_start, WELCOME_MESSAGE
+    from src.telegram.handlers import WELCOME_MESSAGE, handle_start
 
     msg = MagicMock()
     msg.reply_text = AsyncMock()
@@ -134,9 +134,7 @@ async def _test_handler_text():
         mock_handler._handle_internal = AsyncMock(return_value="Test advice")
         MockHandler.return_value = mock_handler
 
-        await handle_text(
-            update, MagicMock(), bridge_client=mock_bc, llm_client=mock_llm
-        )
+        await handle_text(update, MagicMock(), bridge_client=mock_bc, llm_client=mock_llm)
 
     mock_bc.send_message.assert_called_once()
     print("  ✅ Text handler OK")
@@ -180,9 +178,7 @@ async def _test_handler_photo():
         mock_handler._handle_internal = AsyncMock(return_value="Photo analysis")
         MockHandler.return_value = mock_handler
 
-        await handle_photo(
-            update, ctx, bridge_client=mock_bc, llm_client=mock_llm
-        )
+        await handle_photo(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
 
     mock_bc.send_message.assert_called_once()
     print("  ✅ Photo handler OK")
@@ -227,9 +223,7 @@ async def _test_handler_voice():
         mock_handler._handle_internal = AsyncMock(return_value="Voice analysis")
         MockHandler.return_value = mock_handler
 
-        await handle_voice(
-            update, ctx, bridge_client=mock_bc, llm_client=mock_llm
-        )
+        await handle_voice(update, ctx, bridge_client=mock_bc, llm_client=mock_llm)
 
     mock_bc.send_message.assert_called_once()
     print("  ✅ Voice handler OK")
@@ -257,9 +251,7 @@ async def _test_handler_error():
         mock_handler._handle_internal = AsyncMock(side_effect=RuntimeError("Boom"))
         MockHandler.return_value = mock_handler
 
-        await handle_text(
-            update, MagicMock(), bridge_client=mock_bc, llm_client=mock_llm
-        )
+        await handle_text(update, MagicMock(), bridge_client=mock_bc, llm_client=mock_llm)
 
     msg.reply_text.assert_called_once()
     assert "Oops" in msg.reply_text.call_args[0][0]
@@ -285,6 +277,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Smoke test FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

@@ -55,7 +55,7 @@ def text_to_speech(text: str) -> bytes:
             response_format="opus",  # Telegram prefers opus/ogg
         )
 
-        audio_bytes = response.content
+        audio_bytes: bytes = response.content
         logger.info("speech_synthesized", audio_size=len(audio_bytes))
         return audio_bytes
 

@@ -1,7 +1,7 @@
 # Context gathering for Luvr v0.1.0: Instagram + self-summary
 
-**Status:** v0.1.0 recommendation  
-**Authors:** Humphrey Ahn + pi coding agent  
+**Status:** v0.1.0 recommendation
+**Authors:** Humphrey Ahn + pi coding agent
 **Date:** 2026-06-20
 
 ## Research questions & answers

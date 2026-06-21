@@ -17,7 +17,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from src.eval_trace_policy import EvalTracePolicy
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings):  # type: ignore[misc]  # pydantic-settings stub quirk under --strict
     """Luvr application settings loaded from environment variables."""
 
     model_config = SettingsConfigDict(

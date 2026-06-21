@@ -7,12 +7,12 @@ import signal
 from typing import Any
 
 import structlog
-from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters
 
 from src.alpha_auth import build_linking_url
 from src.llm.client import LLMClient, create_llm_client
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.handlers import handle_link, handle_photo, handle_start, handle_text, handle_voice
+from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters
 
 logger = structlog.get_logger(__name__)
 
@@ -46,7 +46,7 @@ class LuvrBot:
         # Core components (lazy-initialized in start)
         self._llm_client: LLMClient | None = None
         self._bridge_client: TelegramBridgeClient | None = None
-        self._app: Application[object, object, object, object] | None = None  # type: ignore[type-arg]
+        self._app: Application[object, object, object, object] | None = None
 
     # ------------------------------------------------------------------
     # Properties
@@ -67,7 +67,7 @@ class LuvrBot:
         return self._bridge_client
 
     @property
-    def app(self) -> Application[object, object, object, object]:  # type: ignore[type-arg]
+    def app(self) -> Application[object, object, object, object]:
         """Return the telegram Application (must be started first)."""
         if self._app is None:
             raise RuntimeError("Bot not started. Call start() first.")
@@ -150,7 +150,7 @@ class LuvrBot:
 # ------------------------------------------------------------------
 
 
-def _register_handlers(app: Application[object, object, object, object]) -> None:  # type: ignore[type-arg]
+def _register_handlers(app: Application[object, object, object, object]) -> None:
     """Register all Telegram message handlers on the Application."""
     # /start command
     app.add_handler(CommandHandler("start", handle_start))

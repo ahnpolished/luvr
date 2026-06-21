@@ -140,7 +140,7 @@ class BlueBubblesClient:
             )
             response.raise_for_status()
             logger.info("attachment_downloaded", guid=attachment_guid, size=len(response.content))
-            return response.content
+            return bytes(response.content)
         except httpx.HTTPError:
             logger.exception("download_attachment_failed", guid=attachment_guid)
             raise
@@ -149,6 +149,6 @@ class BlueBubblesClient:
         """Check if the BlueBubbles server is reachable."""
         try:
             response = await self.client.get("/api/v1/server/info")
-            return response.is_success
+            return bool(response.is_success)
         except httpx.HTTPError:
             return False

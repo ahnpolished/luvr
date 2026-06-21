@@ -57,7 +57,7 @@ app = FastAPI(
 )
 
 
-@app.get("/health")
+@app.get("/health")  # type: ignore[misc]
 async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "ok", "service": "luvr", "version": "0.1.0"}
@@ -66,7 +66,7 @@ async def health_check() -> dict[str, str]:
 alpha_registry = AlphaUserRegistry()
 
 
-@app.post("/webhook")
+@app.post("/webhook")  # type: ignore[misc]
 async def webhook(request: Request) -> JSONResponse:
     """Receive incoming iMessage webhook from BlueBubbles.
 
@@ -92,7 +92,7 @@ async def webhook(request: Request) -> JSONResponse:
 # ------------------------------------------------------------------
 
 
-@app.post("/auth/alpha/exchange")
+@app.post("/auth/alpha/exchange")  # type: ignore[misc]
 async def auth_alpha_exchange(request: Request) -> JSONResponse:
     """Exchange an alpha invite code for a signed session token and profile."""
     try:
@@ -139,7 +139,7 @@ async def auth_alpha_exchange(request: Request) -> JSONResponse:
     )
 
 
-@app.get("/auth/alpha/profile")
+@app.get("/auth/alpha/profile")  # type: ignore[misc]
 async def auth_alpha_profile(request: Request) -> JSONResponse:
     """Return the linked alpha profile for a valid session token."""
     auth_header = request.headers.get("Authorization", "")
@@ -161,7 +161,7 @@ async def auth_alpha_profile(request: Request) -> JSONResponse:
     return JSONResponse(profile.model_dump(mode="json"))
 
 
-@app.post("/auth/alpha/onboarding")
+@app.post("/auth/alpha/onboarding")  # type: ignore[misc]
 async def auth_alpha_onboarding(request: Request) -> JSONResponse:
     """Complete onboarding with optional Instagram info or self-summary."""
     auth_header = request.headers.get("Authorization", "")

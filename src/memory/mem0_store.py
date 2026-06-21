@@ -72,8 +72,7 @@ class PerUserMemoryStore:
         """Search one user's memory only; never returns another user's facts."""
         result = self._backend.search(query, filters={"user_id": user_id}, top_k=top_k)
         return [
-            MemoryFact(memory_id=item["id"], text=item["memory"], user_id=user_id)
-            for item in result.get("results", [])
+            MemoryFact(memory_id=item["id"], text=item["memory"], user_id=user_id) for item in result.get("results", [])
         ]
 
     def forget_all(self, user_id: str) -> None:

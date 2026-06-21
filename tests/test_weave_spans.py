@@ -63,9 +63,7 @@ def test_conversation_span_attributes_wraps_weave_attributes(
 
     monkeypatch.setitem(sys.modules, "weave", SimpleNamespace(attributes=fake_attributes))
 
-    with conversation_span_attributes(
-        ConversationSpanAttributes(message_type="telegram_text", model="gpt-4o-mini")
-    ):
+    with conversation_span_attributes(ConversationSpanAttributes(message_type="telegram_text", model="gpt-4o-mini")):
         calls["inside"] = True
 
     assert calls == {

@@ -1,0 +1,67 @@
+# Configuration file for prek — a fast Git hook framework written in Rust.
+# https://prek.j178.dev
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+repo = "builtin"
+hooks = [
+    { id = "trailing-whitespace" },
+    { id = "end-of-file-fixer", exclude = ".wrangler/" },
+    { id = "check-added-large-files", args = ["--maxkb=500"] },
+]
+
+# ruff — fast Python linter + formatter
+[[repos]]
+repo = "https://github.com/astral-sh/ruff-pre-commit"
+rev = "v0.8.0"
+hooks = [
+    { id = "ruff", args = ["--fix"] },
+    { id = "ruff-format" },
+]
+
+# mypy — static type checker (src/ only; scripts are utilities)
+[[repos]]
+repo = "https://github.com/pre-commit/mirrors-mypy"
+rev = "v1.13.0"
+hooks = [
+    {
+        id = "mypy",
+        args = [
+            "--strict",
+            "--ignore-missing-imports",
+            "--explicit-package-bases",
+        ],
+        files = "^src/",
+        additional_dependencies = [
+            "pydantic>=2.10.0",
+            "structlog>=24.4.0",
+        ],
+    },
+]
+
+# terraform — fmt (local, uses system terraform)
+[[repos]]
+repo = "local"
+hooks = [
+    {
+        id = "terraform-fmt",
+        name = "terraform fmt",
+        language = "system",
+        entry = "terraform",
+        args = ["fmt", "-check", "-diff", "-recursive"],
+        files = "\\.tf$",
+        pass_filenames = false,
+    },
+    {
+        id = "terraform-validate",
+        name = "terraform validate (envs)",
+        language = "system",
+        entry = "bash",
+        args = [
+            "-c",
+            "for dir in infra/envs/*/; do echo \"  validating $dir\"; terraform -chdir=\"$dir\" init -backend=false > /dev/null 2>&1 && terraform -chdir=\"$dir\" validate || exit 1; done",
+        ],
+        files = "^infra/",
+        pass_filenames = false,
+    },
+]

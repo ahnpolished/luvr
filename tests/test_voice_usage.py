@@ -51,10 +51,7 @@ def test_voice_limit_response_distinguishes_allowed_and_blocked(tmp_path: Path) 
     for _ in range(10):
         blocked = record_successful_voice_usage(registry, user_id=profile.user_id)
 
-    assert (
-        voice_limit_response(blocked)
-        == "You have hit the alpha voice memo limit for this month. Text still works."
-    )
+    assert voice_limit_response(blocked) == "You have hit the alpha voice memo limit for this month. Text still works."
     assert (
         voice_limit_response(check_voice_usage_limit(registry, user_id=profile.user_id))
         == "You have hit the alpha voice memo limit for this month. Text still works."

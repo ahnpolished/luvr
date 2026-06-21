@@ -1,6 +1,6 @@
 # 💝 Luvr — Dating Advice Chatbot
 
-> **Like Poke, but for dating advice.**  
+> **Like Poke, but for dating advice.**
 > An AI-powered chatbot that lives in iMessage or Telegram and gives you real, empathetic dating advice — via text, photos, and voice memos.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)

@@ -36,10 +36,7 @@ Describe what you see in the image factually. Then, if relevant, provide kind bu
 
 If the image doesn't seem related to dating/relationships, gently note that and ask what they'd like help with."""
 
-LANGUAGE_INSTRUCTION_EN = (
-    "\n## Language\n"
-    "The user is writing in English. Always respond in English."
-)
+LANGUAGE_INSTRUCTION_EN = "\n## Language\n" "The user is writing in English. Always respond in English."
 
 LANGUAGE_INSTRUCTION_KO = (
     "\n## Language\n"

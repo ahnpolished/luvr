@@ -63,9 +63,7 @@ async def main():
         token=token,
         mode=settings.telegram_mode,
         webhook_url=settings.telegram_webhook_url,
-        allowed_user_ids=list(settings.telegram_allowed_user_ids)
-        if settings.telegram_allowed_user_ids
-        else None,
+        allowed_user_ids=list(settings.telegram_allowed_user_ids) if settings.telegram_allowed_user_ids else None,
     )
 
     await bot.start()

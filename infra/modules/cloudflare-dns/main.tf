@@ -43,11 +43,19 @@ resource "cloudflare_zone_settings_override" "this" {
   zone_id = data.cloudflare_zone.this.id
 
   settings {
-    ssl = var.ssl_mode
+    ssl             = var.ssl_mode
     min_tls_version = "1.2"
-    # Explicitly set read-only settings to avoid drift errors
-    mirage             = "off"
-    proxy_read_timeout = "100"
+    # Read-only settings (must be set to current values to avoid drift errors)
+    http2                       = "on"
+    mirage                      = "off"
+    origin_error_page_pass_thru = "off"
+    polish                      = "off"
+    prefetch_preload            = "off"
+    proxy_read_timeout          = "100"
+    response_buffering          = "off"
+    sort_query_string_for_cache = "off"
+    true_client_ip_header       = "off"
+    webp                        = "off"
   }
 }
 
@@ -72,7 +80,7 @@ resource "cloudflare_ruleset" "rate_limit" {
       characteristics     = ["cf.colo.id", "ip.src"]
       period              = 10
       requests_per_period = var.waf_rate_limit_threshold
-      mitigation_timeout  = 30
+      mitigation_timeout  = 10
     }
   }
 }

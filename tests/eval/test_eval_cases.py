@@ -1084,6 +1084,6 @@ def test_full_eval_suite() -> None:
 
     # All test cases should pass
     results = eval_result.test_results
-    assert all(r.success for r in results), (
-        f"Some eval cases failed: {[(r.name, r.error) for r in results if not r.success]}"
-    )
+    assert all(
+        r.success for r in results
+    ), f"Some eval cases failed: {[(r.name, r.error) for r in results if not r.success]}"
