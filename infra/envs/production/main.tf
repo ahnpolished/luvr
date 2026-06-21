@@ -90,7 +90,7 @@ module "cloudflare" {
   frontend_domain      = var.frontend_domain
   api_domain           = var.api_domain
   railway_cname_target = var.railway_cname_target
-  api_verify_txt_name  = "_railway-verify.api"
+  api_verify_txt_name  = "_railway-verify.api.luvr"
   api_verify_txt_value = "railway-verify=d71f62bfe3259b604ed41243b86fabf35f552dbc3d5e7e5a3919f1e091cc55b0"
   proxied              = false
 }
