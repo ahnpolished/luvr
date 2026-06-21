@@ -36,13 +36,14 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-            -backend-config="endpoints.s3=${{ secrets.R2_ENDPOINT }}" \
+            -backend-config="endpoint=${{ secrets.R2_ENDPOINT }}" \
             -backend-config="access_key=${{ secrets.R2_ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.R2_SECRET_KEY }}" \
             -backend-config="region=auto" \
             -backend-config="skip_credentials_validation=true" \
             -backend-config="skip_region_validation=true" \
-            -backend-config="skip_metadata_api_check=true"
+            -backend-config="skip_metadata_api_check=true" \
+            -backend-config="skip_requesting_account_id=true"
       
       - name: Terraform Apply (Staging)
         run: terraform apply -auto-approve
@@ -77,13 +78,14 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-            -backend-config="endpoints.s3=${{ secrets.R2_ENDPOINT }}" \
+            -backend-config="endpoint=${{ secrets.R2_ENDPOINT }}" \
             -backend-config="access_key=${{ secrets.R2_ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.R2_SECRET_KEY }}" \
             -backend-config="region=auto" \
             -backend-config="skip_credentials_validation=true" \
             -backend-config="skip_region_validation=true" \
-            -backend-config="skip_metadata_api_check=true"
+            -backend-config="skip_metadata_api_check=true" \
+            -backend-config="skip_requesting_account_id=true"
       
       - name: Terraform Apply (Production)
         run: terraform apply -auto-approve
