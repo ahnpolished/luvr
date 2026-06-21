@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 
 import structlog
+from telegram.ext import ContextTypes
 
 from src.alpha.registry import AlphaUserRegistry
 from src.alpha.tarot_usage import TarotUsageGate
@@ -21,7 +22,6 @@ from src.tarot.images import CARD_SLUGS, card_image_path, random_cards
 from src.telegram.bridge_client import TelegramBridgeClient
 from src.telegram.models import InternalMessage, TelegramAttachment, TelegramMessageType
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import ContextTypes
 
 logger = structlog.get_logger(__name__)
 

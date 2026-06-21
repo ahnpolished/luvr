@@ -7,6 +7,14 @@ import signal
 from typing import Any
 
 import structlog
+from telegram.ext import (
+    Application,
+    ApplicationBuilder,
+    CallbackQueryHandler,
+    CommandHandler,
+    MessageHandler,
+    filters,
+)
 
 from src.alpha.registry import AlphaUserRegistry
 from src.alpha.tarot_usage import TarotUsageGate
@@ -23,14 +31,6 @@ from src.telegram.handlers import (
     handle_tarot,
     handle_text,
     handle_voice,
-)
-from telegram.ext import (
-    Application,
-    ApplicationBuilder,
-    CallbackQueryHandler,
-    CommandHandler,
-    MessageHandler,
-    filters,
 )
 
 logger = structlog.get_logger(__name__)
