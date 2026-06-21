@@ -6,9 +6,6 @@
 #   - Custom domain with auto-SSL
 #   - Environment variable (API base URL)
 #
-# NOTE: git_repository linking is configured via Vercel's GitHub App
-# (installed on the repo), not via Terraform. The project_name must
-# match the Vercel project created by the GitHub integration.
 # --------------------------------------------------------------------
 
 resource "vercel_project" "this" {
@@ -19,6 +16,11 @@ resource "vercel_project" "this" {
   install_command  = var.install_command
   build_command    = var.build_command
   output_directory = var.output_directory
+
+  git_repository = {
+    type = "github"
+    repo = var.git_repository
+  }
 }
 
 # Custom domain

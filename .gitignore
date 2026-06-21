@@ -52,3 +52,6 @@ secrets/
 *.pem
 *.key
 .deepeval
+
+# Vercel
+.vercel
