@@ -7,6 +7,7 @@ dist/
 build/
 *.egg
 .env
+.env*
 .venv/
 venv/
 
@@ -55,3 +56,4 @@ secrets/
 
 # Vercel
 .vercel
+.env.production

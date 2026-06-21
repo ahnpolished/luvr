@@ -29,8 +29,26 @@ function ContextRoute() {
   const { setContext } = useOnboarding()
   return (
     <InstagramContextScreen
-      onContinue={(context) => {
+      onContinue={async (context) => {
         setContext(context)
+        // TODO: VITE_TEST_SESSION_TOKEN is a placeholder until the real
+        // alpha-code/linking auth flow is wired up (AuthScreen is still mocked).
+        // This call will 403 against the real backend until then.
+        try {
+          await fetch(`${import.meta.env.VITE_API_URL}/auth/alpha/onboarding`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${import.meta.env.VITE_TEST_SESSION_TOKEN ?? ''}`,
+            },
+            body: JSON.stringify({
+              instagram_handle: context.handle ?? '',
+              self_summary: context.selfSummary ?? '',
+            }),
+          })
+        } catch (err) {
+          console.error('Failed to submit onboarding context', err)
+        }
         navigate('/telegram')
       }}
     />

@@ -30,6 +30,7 @@ class Settings(BaseSettings):  # type: ignore[misc]  # pydantic-settings stub qu
     host: str = "::"
     port: int = 8000
     debug: bool = False
+    allowed_origins: str = "https://luvr-staging.vercel.app,http://localhost:5173"
 
     # --- BlueBubbles iMessage Bridge ---
     bluebubbles_server_url: str = "http://localhost:1234"
