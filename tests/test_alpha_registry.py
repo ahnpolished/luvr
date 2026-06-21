@@ -111,3 +111,16 @@ def test_usage_counters_instagram_context_and_persistence_without_memory(tmp_pat
     assert reloaded_profile.instagram_context_summary == "Public profile suggests outdoorsy, playful tone."
     assert reloaded_profile.usage_counters == {"voice_message": 2}
     assert "memory" not in reloaded_profile.model_dump()
+
+
+def test_update_profile_sets_persona(tmp_path):
+    """update_profile can set and change a user's selected persona."""
+    registry = AlphaUserRegistry(storage_path=tmp_path / "alpha-users.json")
+    profile = registry.get_or_create_for_telegram(telegram_user_id=123, telegram_chat_id=456)
+    assert profile.persona is None
+
+    updated = registry.update_profile(profile.user_id, persona="coach")
+    assert updated.persona == "coach"
+
+    updated_again = registry.update_profile(profile.user_id, persona="default")
+    assert updated_again.persona == "default"

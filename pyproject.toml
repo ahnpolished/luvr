@@ -78,6 +78,7 @@ ignore = ["SIM105"]
 "tests/**/*.py" = ["N806"]
 "scripts/**/*.py" = ["N806"]
 "src/llm/prompts.py" = ["E501"]
+"tests/eval/test_persona_*.py" = ["E501"]
 
 [tool.ty.environment]
 python-version = "3.12"

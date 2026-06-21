@@ -8,11 +8,30 @@ from typing import Any
 
 import structlog
 
+from src.alpha.registry import AlphaUserRegistry
+from src.alpha.tarot_usage import TarotUsageGate
 from src.alpha_auth import build_linking_url
 from src.llm.client import LLMClient, create_llm_client
 from src.telegram.bridge_client import TelegramBridgeClient
-from src.telegram.handlers import handle_link, handle_photo, handle_start, handle_text, handle_voice
-from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters
+from src.telegram.handlers import (
+    PERSONA_CALLBACK_PREFIX,
+    handle_link,
+    handle_persona,
+    handle_persona_callback,
+    handle_photo,
+    handle_start,
+    handle_tarot,
+    handle_text,
+    handle_voice,
+)
+from telegram.ext import (
+    Application,
+    ApplicationBuilder,
+    CallbackQueryHandler,
+    CommandHandler,
+    MessageHandler,
+    filters,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -47,6 +66,8 @@ class LuvrBot:
         self._llm_client: LLMClient | None = None
         self._bridge_client: TelegramBridgeClient | None = None
         self._app: Application[Any, Any, Any, Any, Any, Any] | None = None
+        self._alpha_registry: AlphaUserRegistry | None = None
+        self._tarot_gate: TarotUsageGate | None = None
 
     # ------------------------------------------------------------------
     # Properties
@@ -73,6 +94,20 @@ class LuvrBot:
             raise RuntimeError("Bot not started. Call start() first.")
         return self._app
 
+    @property
+    def alpha_registry(self) -> AlphaUserRegistry:
+        """Lazy-initialize the alpha user registry (persona + tarot usage)."""
+        if self._alpha_registry is None:
+            self._alpha_registry = AlphaUserRegistry()
+        return self._alpha_registry
+
+    @property
+    def tarot_gate(self) -> TarotUsageGate:
+        """Lazy-initialize the tarot usage gate."""
+        if self._tarot_gate is None:
+            self._tarot_gate = TarotUsageGate(self.alpha_registry)
+        return self._tarot_gate
+
     # ------------------------------------------------------------------
     # Lifecycle
     # ------------------------------------------------------------------
@@ -88,6 +123,8 @@ class LuvrBot:
         # Store shared dependencies in bot_data so handlers can access them
         self._app.bot_data["bridge_client"] = self.bridge_client
         self._app.bot_data["llm_client"] = self.llm_client
+        self._app.bot_data["alpha_registry"] = self.alpha_registry
+        self._app.bot_data["tarot_gate"] = self.tarot_gate
 
         _register_handlers(self._app)
 
@@ -157,6 +194,13 @@ def _register_handlers(app: Application[Any, Any, Any, Any, Any, Any]) -> None:
 
     # /link command — send onboarding deep-link
     app.add_handler(CommandHandler("link", _build_handler(handle_link)))
+
+    # /persona command — pick a persona; callback handles the button tap
+    app.add_handler(CommandHandler("persona", handle_persona))
+    app.add_handler(CallbackQueryHandler(handle_persona_callback, pattern=f"^{PERSONA_CALLBACK_PREFIX}"))
+
+    # /tarot command — 3-card relationship reading
+    app.add_handler(CommandHandler("tarot", _build_handler(handle_tarot)))
 
     # Text messages (excluding commands)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, _build_handler(handle_text)))

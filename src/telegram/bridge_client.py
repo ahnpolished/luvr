@@ -130,6 +130,38 @@ class TelegramBridgeClient:
             logger.exception("telegram_send_voice_failed", chat_id=self._chat_id)
             raise
 
+    async def send_photos(self, photo_paths: list[Any], caption: str | None = None) -> Any:
+        """Send one or more photos as a media group (e.g. a tarot card spread).
+
+        Args:
+            photo_paths: Filesystem paths to the images to send, in order.
+            caption: Optional caption attached to the first photo.
+
+        Returns:
+            The list of sent ``telegram.Message`` objects.
+
+        Raises:
+            RuntimeError: If the bridge client was not configured with a bot.
+        """
+        if self._bot is None:
+            logger.warning("bridge_not_configured_for_photos")
+            raise RuntimeError("TelegramBridgeClient not configured with bot for photos")
+
+        from telegram import InputMediaPhoto
+
+        media = [
+            InputMediaPhoto(media=path.open("rb"), caption=caption if i == 0 else None)
+            for i, path in enumerate(photo_paths)
+        ]
+
+        try:
+            sent = await self._bot.send_media_group(chat_id=self._chat_id, media=media)
+            logger.debug("telegram_photos_sent", chat_id=self._chat_id, count=len(photo_paths))
+            return sent
+        except Exception:
+            logger.exception("telegram_send_photos_failed", chat_id=self._chat_id)
+            raise
+
     async def aclose(self) -> None:
         """No-op close — Telegram connection is managed by the Application."""
         self._attachment_cache.clear()

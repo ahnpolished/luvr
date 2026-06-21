@@ -39,6 +39,7 @@ class AlphaUserProfile(BaseModel):
     allowlisted: bool = False
     usage_counters: dict[str, int] = Field(default_factory=dict)
     instagram_context_summary: str | None = None
+    persona: str | None = None
 
 
 class _RegistryState(BaseModel):
@@ -135,6 +136,7 @@ class AlphaUserRegistry:
         nickname: str | None = None,
         email: str | None = None,
         instagram_context_summary: str | None = None,
+        persona: str | None = None,
     ) -> AlphaUserProfile:
         """Update intentionally provided alpha profile fields."""
         profile = self.get_profile(user_id)
@@ -152,6 +154,8 @@ class AlphaUserRegistry:
             profile.email = email
         if instagram_context_summary is not None:
             profile.instagram_context_summary = instagram_context_summary
+        if persona is not None:
+            profile.persona = persona
         self._state.profiles[user_id] = profile
         self._save_state()
         return profile

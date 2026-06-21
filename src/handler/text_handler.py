@@ -34,28 +34,30 @@ class TextHandler:
         user_text = payload.text.strip()
         return await self._generate(user_text)
 
-    async def _handle_internal(self, msg: InternalMessage) -> str:
+    async def _handle_internal(self, msg: InternalMessage, persona: str | None = None) -> str:
         """Process an InternalMessage (Telegram path) and generate dating advice.
 
         Args:
             msg: Normalised internal message with text content.
+            persona: Optional persona slug (see ``src.llm.prompts.PERSONAS``)
+                selected by the user via the ``/persona`` command.
 
         Returns:
             Generated response text.
         """
-        return await self._generate(msg.text.strip())
+        return await self._generate(msg.text.strip(), persona=persona)
 
-    async def _generate(self, user_text: str) -> str:
+    async def _generate(self, user_text: str, persona: str | None = None) -> str:
         """Core generation logic shared by iMessage and Telegram paths."""
         if not user_text:
             logger.info("empty_text_message")
             return "Hey! What's on your mind? I'm here to help with any dating or relationship questions you have. 💝"
 
-        logger.info("handling_text_message", text_len=len(user_text))
+        logger.info("handling_text_message", text_len=len(user_text), persona=persona)
 
         response = await self.llm_client.generate_response(
             user_message=user_text,
-            system_prompt=build_system_prompt(user_text),
+            system_prompt=build_system_prompt(user_text, persona=persona),
         )
 
         logger.info("text_response_generated", response_len=len(response))

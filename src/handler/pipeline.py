@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import cast
 
 import structlog
@@ -11,6 +12,7 @@ from src.bridge.models import WebhookPayload
 from src.config import settings
 from src.handler.photo_handler import PhotoHandler
 from src.handler.router import MessageRouter
+from src.handler.split import split_response
 from src.handler.text_handler import TextHandler
 from src.handler.voice_handler import VoiceHandler
 from src.llm.client import LLMClient, create_llm_client
@@ -133,11 +135,20 @@ class MessagePipeline:
                 return
 
             if response:
-                await self.bridge_client.send_message(
+                bubbles = split_response(response)
+                for i, bubble in enumerate(bubbles):
+                    if i > 0:
+                        await asyncio.sleep(settings.multi_turn_delay_seconds)
+                    await self.bridge_client.send_message(
+                        chat_guid=payload.chat_guid,
+                        message=bubble,
+                    )
+                logger.info(
+                    "response_sent",
+                    msg_type=msg_type,
                     chat_guid=payload.chat_guid,
-                    message=response,
+                    bubbles=len(bubbles),
                 )
-                logger.info("response_sent", msg_type=msg_type, chat_guid=payload.chat_guid)
 
         except Exception:
             logger.exception("pipeline_error")
