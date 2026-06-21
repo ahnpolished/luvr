@@ -1,4 +1,4 @@
-name: Terraform Apply
+name: Terraform Apply (Staging)
 
 on:
   push:
@@ -11,9 +11,11 @@ permissions:
   contents: read
 
 jobs:
-  staging:
+  terraform:
     name: Apply Staging
     runs-on: ubuntu-latest
+    environment:
+      name: staging
 
     defaults:
       run:
@@ -43,37 +45,27 @@ jobs:
       - name: Terraform Apply (Staging)
         run: terraform apply -auto-approve
 
-  production:
-    name: Apply Production
-    needs: staging
+  vercel-deploy:
+    name: Deploy Vercel (Staging)
+    needs: terraform
     runs-on: ubuntu-latest
     environment:
-      name: production
-
-    defaults:
-      run:
-        working-directory: infra/envs/production
-
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      TF_VAR_vercel_api_token: ${{ secrets.VERCEL_API_TOKEN }}
+      name: staging
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "~> 1.9"
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_API_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Build
+        run: vercel build --prod --token="${{ secrets.VERCEL_API_TOKEN }}"
 
-      - name: Terraform Apply (Production)
-        run: terraform apply -auto-approve
+      - name: Deploy
+        run: vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_API_TOKEN }}"
