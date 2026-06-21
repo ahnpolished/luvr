@@ -35,7 +35,7 @@ function ContextRoute() {
         // alpha-code/linking auth flow is wired up (AuthScreen is still mocked).
         // This call will 403 against the real backend until then.
         try {
-          await fetch(`${import.meta.env.VITE_API_URL}/auth/alpha/onboarding`, {
+          await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/alpha/onboarding`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
