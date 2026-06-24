@@ -1,0 +1,24 @@
+.choice-chip {
+  flex: none;
+  white-space: nowrap;
+  background: rgba(247, 239, 227, 0.06);
+  color: #E8DCCB;
+  border: 1px solid rgba(247, 239, 227, 0.18);
+  padding: 9px 13px;
+  border-radius: 999px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.choice-chip:hover:not(:disabled) {
+  border-color: var(--orb-accent, #FF6B61);
+  color: #fff;
+}
+
+.choice-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

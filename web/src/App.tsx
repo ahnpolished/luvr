@@ -1,8 +1,9 @@
-import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom'
 import { LandingScreen } from './screens/LandingScreen'
 import { AuthScreen } from './screens/AuthScreen'
 import { InstagramContextScreen } from './screens/InstagramContextScreen'
 import { TelegramHandoffScreen } from './screens/TelegramHandoffScreen'
+import { TarotScreen } from './screens/tarot'
 import { OnboardingProvider } from './state/OnboardingProvider'
 import { useOnboarding } from './state/onboarding-context'
 
@@ -26,20 +27,21 @@ function AuthRoute() {
 
 function ContextRoute() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { setContext } = useOnboarding()
+
+  // Session token from deep-link redirect (real auth flow) or fallback
+  const sessionToken = searchParams.get('token') ?? import.meta.env.VITE_TEST_SESSION_TOKEN ?? ''
   return (
     <InstagramContextScreen
       onContinue={async (context) => {
         setContext(context)
-        // TODO: VITE_TEST_SESSION_TOKEN is a placeholder until the real
-        // alpha-code/linking auth flow is wired up (AuthScreen is still mocked).
-        // This call will 403 against the real backend until then.
         try {
           await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/alpha/onboarding`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${import.meta.env.VITE_TEST_SESSION_TOKEN ?? ''}`,
+              Authorization: `Bearer ${sessionToken}`,
             },
             body: JSON.stringify({
               instagram_handle: context.handle ?? '',
@@ -68,6 +70,7 @@ function App() {
           <Route path="/auth" element={<AuthRoute />} />
           <Route path="/context" element={<ContextRoute />} />
           <Route path="/telegram" element={<TelegramRoute />} />
+          <Route path="/tarot" element={<TarotScreen />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </OnboardingProvider>

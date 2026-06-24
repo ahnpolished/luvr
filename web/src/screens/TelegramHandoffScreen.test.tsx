@@ -26,6 +26,6 @@ describe('TelegramHandoffScreen', () => {
 
   it('falls back to a default mocked deep link', () => {
     render(<TelegramHandoffScreen />)
-    expect(screen.getByText(/t\.me\/LuvrBot/)).toBeInTheDocument()
+    expect(screen.getByText(/t\.me\//)).toBeInTheDocument()
   })
 })

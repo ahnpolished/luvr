@@ -1,0 +1,223 @@
+/* StellaCloud Orb — celestial nebula sphere
+   Four visual states: idle, listening, speaking, thinking
+   All animations are GPU-composited (transform + opacity only) */
+
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.09); opacity: 1; }
+}
+
+@keyframes orb-rotate {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orb-rotate-rev {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes ring-expand {
+  0% { transform: scale(0.7); opacity: 0.55; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+.orb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.orb:focus-visible {
+  outline: 2px solid var(--orb-accent, #FF6B61);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+/* --- Aura glow ring --- */
+.orb__aura {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--orb-accent, #FF6B61) 30%, transparent),
+    transparent 65%
+  );
+  filter: blur(14px);
+  opacity: 0.5;
+  animation: orb-breathe var(--orb-breathe-duration, 4s) ease-in-out infinite;
+}
+
+.orb--listening .orb__aura {
+  opacity: 0.85;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--orb-accent, #FF6B61) 42%, transparent),
+    transparent 62%
+  );
+  animation: orb-breathe 1.4s ease-in-out infinite;
+}
+
+.orb--speaking .orb__aura {
+  opacity: 0.95;
+  animation: orb-pulse 1.2s ease-in-out infinite;
+}
+
+.orb--thinking .orb__aura {
+  opacity: 0.6;
+  animation: orb-breathe 2.6s ease-in-out infinite;
+}
+
+/* --- Expanding rings (listening only) --- */
+.orb__ring {
+  position: absolute;
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  border: 1px solid var(--orb-accent, #FF6B61);
+  animation: ring-expand 1.8s ease-out infinite;
+  pointer-events: none;
+}
+
+.orb__ring:nth-child(2) {
+  animation-delay: 0.9s;
+}
+
+/* --- Core sphere --- */
+.orb__core {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 35% 28%,
+    var(--orb-core-outer, #5A4636) 0%,
+    var(--orb-core-mid, #2A1D16) 52%,
+    var(--orb-core-inner, #140C09) 100%
+  );
+  box-shadow:
+    inset 0 6px 24px rgba(0, 0, 0, 0.7),
+    inset 0 -8px 30px rgba(0, 0, 0, 0.85),
+    0 24px 60px -20px rgba(0, 0, 0, 0.9);
+}
+
+/* --- Conic gradient overlays (nebula swirls) --- */
+.orb__swirl {
+  position: absolute;
+  inset: -30%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.orb__swirl--gold {
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    color-mix(in srgb, var(--orb-gold, #C9A24B) 40%, transparent),
+    transparent 40%
+  );
+  animation: orb-rotate 14s linear infinite;
+}
+
+.orb__swirl--accent {
+  background: conic-gradient(
+    from 120deg,
+    transparent,
+    color-mix(in srgb, var(--orb-accent, #FF6B61) 45%, transparent),
+    transparent 35%
+  );
+  animation: orb-rotate-rev 18s linear infinite;
+}
+
+/* --- Inner core glow --- */
+.orb__inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 55%,
+    color-mix(in srgb, var(--orb-gold, #C9A24B) 38%, transparent) 0%,
+    transparent 62%
+  );
+  animation: orb-breathe var(--orb-breathe-duration, 4s) ease-in-out infinite;
+}
+
+.orb--listening .orb__inner {
+  background: radial-gradient(
+    circle at 50% 55%,
+    color-mix(in srgb, var(--orb-accent, #FF6B61) 80%, #fff) 0%,
+    color-mix(in srgb, var(--orb-accent, #FF6B61) 50%, transparent) 45%,
+    transparent 72%
+  );
+  animation: orb-breathe 1.4s ease-in-out infinite;
+}
+
+.orb--speaking .orb__inner {
+  background: radial-gradient(
+    circle at 50% 55%,
+    color-mix(in srgb, var(--orb-gold, #C9A24B) 75%, #fff) 0%,
+    color-mix(in srgb, var(--orb-accent, #FF6B61) 60%, transparent) 40%,
+    transparent 70%
+  );
+  animation: orb-pulse 1.1s ease-in-out infinite;
+}
+
+.orb--thinking .orb__inner {
+  background: radial-gradient(
+    circle at 50% 55%,
+    color-mix(in srgb, var(--orb-gold, #C9A24B) 55%, transparent) 0%,
+    transparent 60%
+  );
+  animation: orb-breathe 2.2s ease-in-out infinite;
+}
+
+/* --- Specular highlight --- */
+.orb__highlight {
+  position: absolute;
+  top: 16%;
+  left: 24%;
+  width: 26%;
+  height: 16%;
+  border-radius: 50%;
+  background: rgba(255, 250, 240, 0.4);
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+/* --- Mic button overlay --- */
+.orb__mic {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(247, 239, 227, 0.2);
+  background: rgba(247, 239, 227, 0.05);
+  color: #E8DCCB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.orb--listening .orb__mic {
+  border-color: var(--orb-accent, #FF6B61);
+  background: color-mix(in srgb, var(--orb-accent, #FF6B61) 22%, transparent);
+  color: var(--orb-accent, #FF6B61);
+  animation: orb-breathe 1.2s ease-in-out infinite;
+}

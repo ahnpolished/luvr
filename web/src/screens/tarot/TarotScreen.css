@@ -1,0 +1,73 @@
+.tarot-screen {
+  position: relative;
+  min-height: 100vh;
+  background: radial-gradient(125% 80% at 50% -5%, var(--tarot-bg-start, #2B201A) 0%, var(--tarot-bg-mid, #1A1310) 50%, var(--tarot-bg-end, #120D0B) 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.tarot-screen__header {
+  position: relative;
+  z-index: 5;
+  flex: none;
+  padding: 16px 22px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tarot-screen__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tarot-screen__logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, var(--orb-accent, #FF6B61), var(--orb-gold, #C9A24B));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 12px;
+  color: #14100E;
+}
+
+.tarot-screen__title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.tarot-screen__title-main {
+  font-size: 12px;
+  font-weight: 700;
+  color: #F7EFE3;
+}
+
+.tarot-screen__title-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: #8A7D72;
+  letter-spacing: 0.04em;
+}
+
+.tarot-screen__dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tarot-screen__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(247, 239, 227, 0.18);
+  transition: background 0.3s ease;
+}
+
+.tarot-screen__dot--active {
+  background: var(--orb-accent, #FF6B61);
+}

@@ -1,0 +1,37 @@
+/* Tarot-specific design tokens extending tokens.css */
+:root {
+  /* Orb colors — celestial nebula palette */
+  --orb-gold: #C9A24B;
+  --orb-accent: #FF6B61;
+  --orb-core-outer: #5A4636;
+  --orb-core-mid: #2A1D16;
+  --orb-core-inner: #140C09;
+
+  /* Background gradient stops */
+  --tarot-bg-start: #2B201A;
+  --tarot-bg-mid: #1A1310;
+  --tarot-bg-end: #120D0B;
+
+  /* Card colors */
+  --card-back-gradient-start: #2A1F19;
+  --card-back-gradient-end: #150E0B;
+  --card-face-gradient-start: #F7EFE1;
+  --card-face-gradient-end: #EADFCB;
+
+  /* Animation durations */
+  --orb-breathe-duration: 4s;
+  --orb-pulse-duration: 1.1s;
+  --orb-listen-duration: 1.4s;
+  --orb-think-duration: 2.6s;
+  --orb-rotate-duration: 14s;
+  --orb-rotate-rev-duration: 18s;
+  --ring-expand-duration: 1.8s;
+
+  /* Card fan */
+  --fan-card-width: 74px;
+  --fan-card-height: 118px;
+  --fan-card-radius: 13px;
+
+  /* Typography overrides for tarot persona */
+  --font-reader: 'Spectral', serif;
+}

@@ -1,12 +1,14 @@
 import { Button, Card, PageShell, StepHeader } from '../components'
 import './TelegramHandoffScreen.css'
 
+const BOT_USERNAME = import.meta.env.VITE_TELEGRAM_BOT_USERNAME ?? 'LuvrBot'
+const START_PARAM = import.meta.env.VITE_TELEGRAM_START_PARAM ?? 'demo-onboarding-token'
+const DEFAULT_DEEP_LINK = `https://t.me/${BOT_USERNAME}?start=${START_PARAM}`
+
 export interface TelegramHandoffScreenProps {
-  /** Mocked deep link — real link generation is backend work, out of scope here. */
+  /** Override deep link — defaults to VITE_TELEGRAM_BOT_USERNAME env var. */
   deepLink?: string
 }
-
-const DEFAULT_DEEP_LINK = 'https://t.me/LuvrBot?start=demo-onboarding-token'
 
 export function TelegramHandoffScreen({
   deepLink = DEFAULT_DEEP_LINK,
